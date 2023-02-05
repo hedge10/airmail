@@ -1,0 +1,33 @@
+POST http://localhost:2525/mail/send
+Content-Type: application/json
+
+{
+    "from": {
+        "name": "Holger",
+        "email": "holger.loesken@codedge.de"
+    },
+    "to": [
+        {
+            "name": "Holger",
+            "email": "holger.loesken@codedge.de"
+        },
+        {
+            "name": "Maxi",
+            "email": "maxi.mustermann@example.com"
+        }
+    ],
+    "subject": "This is a test email",
+    "message": "This is some sample text.\n\rA new line is a good idea."
+}
+
+###
+
+POST http://localhost:2525/mail/send
+Content-Type: application/x-www-form-urlencoded
+
+{
+    "from": {
+        "name": "Holger",
+        "email": "holger.loesken@codedge.de"
+    }
+}
