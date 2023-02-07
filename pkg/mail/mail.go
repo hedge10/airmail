@@ -106,10 +106,9 @@ func buildMessage(sender string, receipients []string, subject string, message s
 	from := fmt.Sprintf("From: %s", sender)
 	to := fmt.Sprintf("To: %s", joined_rcpts)
 	sub := fmt.Sprintf("Subject: %s", subject)
-	msg := fmt.Sprintf("%s", message)
 
 	return strings.NewReader(from + "\r\n" +
 		to + "\r\n" +
 		sub + "\r\n\r\n" +
-		msg + "\r\n")
+		message + "\r\n")
 }
