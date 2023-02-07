@@ -1,33 +1,45 @@
-POST http://localhost:2525/mail/send
+POST http://127.0.0.1:8081/mail/send
 Content-Type: application/json
 
 {
     "from": {
-        "name": "Holger",
-        "email": "holger.loesken@codedge.de"
+        "name": "John",
+        "email": "john.doe@example.com"
     },
     "to": [
         {
-            "name": "Holger",
-            "email": "holger.loesken@codedge.de"
+            "name": "Batman & Robin",
+            "email": "batman_and_robin@warnerbros.com"
         },
         {
-            "name": "Maxi",
-            "email": "maxi.mustermann@example.com"
+            "name": "Pinky & the Brain",
+            "email": "pinky.and.the.brain@spielberg.com"
         }
     ],
-    "subject": "This is a test email",
+    "subject": "This is a marvelous email",
     "message": "This is some sample text.\n\rA new line is a good idea."
 }
 
 ###
 
-POST http://localhost:2525/mail/send
+POST http://localhost:8081/mail/send
 Content-Type: application/x-www-form-urlencoded
 
 {
     "from": {
-        "name": "Holger",
-        "email": "holger.loesken@codedge.de"
-    }
+        "name": "John",
+        "email": "john.doe@example.com"
+    },
+    "to": [
+        {
+            "name": "Batman & Robin",
+            "email": "batman_and_robin@warnerbros.com"
+        },
+        {
+            "name": "Pinky & the Brain",
+            "email": "pinky.and.the.brain@spielberg.com"
+        }
+    ],
+    "subject": "This is a marvelous email",
+    "message": "This is some sample text.\n\rA new line is a good idea."
 }

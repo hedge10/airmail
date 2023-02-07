@@ -1,0 +1,22 @@
+[req]
+default_bits = 2048
+prompt = no
+default_md = sha256
+x509_extensions = v3_req
+distinguished_name = dn
+
+[dn]
+C = DE
+ST = B
+L = Berlin
+O = Acme Inc.
+OU = Testing Domain
+emailAddress = webmaster@localhost
+CN = localhost
+
+[v3_req]
+subjectAltName = DNS:localhost
+
+[alt_names]
+DNS.1 = *.localhost
+DNS.2 = localhost

@@ -24,6 +24,7 @@ func main() {
 	e.Validator = &api.CustomValidator{Validator: validator.New()}
 	e.Use(middleware.Config(cfg))
 	e.Use(middleware.LogRequest())
+	e.Use(middleware.EnforceContentType())
 
 	// Register our routes
 	api.RegisterHandler(e, cfg)

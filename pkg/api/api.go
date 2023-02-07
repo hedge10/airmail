@@ -21,10 +21,10 @@ func sendMail(c echo.Context) error {
 
 	var sending_err error
 	if cfg.SmtpAuth == mail.AUTH_NONE {
-		sending_err = mail.SendWithoutAuth(address, email.From, email.To, "", "")
+		sending_err = mail.SendWithoutAuth(address, email.From, email.To, email.Subject, email.Message)
 	} else {
 		client := mail.CreateClient(cfg.SmtpAuth)
-		sending_err = mail.Send(address, client, email.From, email.To, "", "")
+		sending_err = mail.Send(address, client, email.From, email.To, email.Subject, email.Message)
 	}
 
 	if sending_err == nil {

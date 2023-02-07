@@ -24,3 +24,17 @@ Set these environment variables to let Airmail connect to your SMTP:
 - `AM_SMTP_PASS`, default: `<empty>`
 - `AM_SMTP_AUTH_MECHANISM`, default: `none` (choose between `none`, `plain`, `login`, `cram-md5`, `ntlm`)
 
+
+
+## Contributing
+
+Thank you for considering contributing. Please have a look at the following sections to help you setting up a local environment.
+
+### Development environment
+
+Run `docker-compose up -d` in the root folder to build a local SMTP server and providing a small container running Airmail.
+
+The SMTP server is based on [Mailpit](https://github.com/axllent/mailpit), running the server on port `1025` and the web interface on `http://localhost:8025`. Make sure these ports are not already in use by your host system.
+
+After the container is built and up and running, run `docker exec -it airmail sh` to give you a shell into the
+

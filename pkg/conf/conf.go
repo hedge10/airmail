@@ -16,10 +16,10 @@ type Config struct {
 	SmtpPort	int		`envconfig:"AM_SMTP_PORT" default:"25"`
 	SmtpAuth	string	`envconfig:"AM_SMTP_AUTH_MECHANISM" default:"none"`
 
-	Host		string  `envconfig:"AM_HOST" default:"127.0.0.1"`
+	Host		string  `envconfig:"AM_HOST" default:""`
 	Port		int     `envconfig:"AM_PORT" default:"8081"`
 
-	Env       string  `envconfig:"AM_ENV" default:"prod"`
+	Env       string  `envconfig:"AM_ENV" default:"dev"`
 }
 
 var (
@@ -48,6 +48,8 @@ func (cfg *Config) logging() error {
 		log.Debug("Set log level to debug")
 		log.SetLevel(log.DebugLevel)
 	}
+
+	log.Info(fmt.Sprintf("Log level set to %s", log.GetLevel()))
 
 	return nil
 }

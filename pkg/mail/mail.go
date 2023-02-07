@@ -19,35 +19,35 @@ const (
 
 type(
 	party struct {
-		Name string `json:"name"`
-		Email	string `json:"email" validate:"required,email"`
+		Name string `json:"name" form:"name"`
+		Email	string `json:"email" form:"email" validate:"required,email"`
 	}
 
 	Email struct {
-		From party `json:"from" validate:"required,dive"`
-		To []party `json:"to" validate:"required,dive,required"`
-		Cc []party `json:"cc" validate:"dive"`
-		Bcc []party `json:"bcc" validate:"dive"`
-		Subject string `json:"subject" validate:"required"`
-		Message string `json:"message" validate:"required"`
+		From party `json:"from" form:"from" validate:"required,dive"`
+		To []party `json:"to" form:"to" validate:"required,dive,required"`
+		Cc []party `json:"cc" form:"cc" validate:"dive"`
+		Bcc []party `json:"bcc" form:"bcc" validate:"dive"`
+		Subject string `json:"subject" form:"subject" validate:"required"`
+		Message string `json:"message" form:"message" validate:"required"`
 	}
 )
 
 
 func CreateClient(auth_mechanism string) sasl.Client {
 	if auth_mechanism == AUTH_LOGIN {
-		log.Info(fmt.Sprintf("Using %s method for authentication", AUTH_LOGIN))
+		log.Debug(fmt.Sprintf("Using %s method for authentication", AUTH_LOGIN))
 		return sasl.NewLoginClient("", "")
 	}
 
-	log.Info(fmt.Sprintf("Using %s method for authentication", AUTH_PLAIN))
+	log.Debug(fmt.Sprintf("Using %s method for authentication", AUTH_PLAIN))
 	return sasl.NewPlainClient("", "", "")
 }
 
 func Send(server_address string, client sasl.Client, from party, to []party, subject string, msg string) error {
 	sender := fmt.Sprintf("%s<%s>", from.Name, from.Email)
 	receivers := buildReceivers(to)
-	message := buildMessage(receivers, subject, msg)
+	message := buildMessage(sender, receivers, subject, msg)
 
 	log.Info("Sending mail to SMTP")
 	err := smtp.SendMail(server_address, client, sender, receivers, message)
@@ -67,8 +67,7 @@ func SendWithoutAuth(server_address string, from party, to []party, subject stri
 
 	sender := fmt.Sprintf("%s<%s>", from.Name, from.Email)
 	receivers := buildReceivers(to)
-	message := buildMessage(buildRawReceivers(to), subject, msg)
-
+	message := buildMessage(sender, buildRawReceivers(to), subject, msg)
 
 
 	log.Info("Sending mail to SMTP")
@@ -102,15 +101,15 @@ func buildRawReceivers(to []party) []string {
 	return receivers
 }
 
-func buildMessage(receipients []string, subject string, message string) *strings.Reader {
+func buildMessage(sender string, receipients []string, subject string, message string) *strings.Reader {
 	joined_rcpts := strings.Join(receipients, ",")
-	to := fmt.Sprintf("To: %s\r\n", joined_rcpts)
-	sub := fmt.Sprintf("Subject: %s\r\n\r\n", subject)
-	msg := fmt.Sprintf("%s\r\n", message)
+	from := fmt.Sprintf("From: %s", sender)
+	to := fmt.Sprintf("To: %s", joined_rcpts)
+	sub := fmt.Sprintf("Subject: %s", subject)
+	msg := fmt.Sprintf("%s", message)
 
-	log.Info("MESSAGE--")
-
-	log.Info("--MESSAGE")
-
-	return strings.NewReader(fmt.Sprintf(to + sub + msg))
+	return strings.NewReader(from + "\r\n" +
+		to + "\r\n" +
+		sub + "\r\n\r\n" +
+		msg + "\r\n")
 }
