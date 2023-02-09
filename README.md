@@ -36,5 +36,8 @@ Run `docker-compose up -d` in the root folder to build a local SMTP server and p
 
 The SMTP server is based on [Mailpit](https://github.com/axllent/mailpit), running the server on port `1025` and the web interface on `http://localhost:8025`. Make sure these ports are not already in use by your host system.
 
-After the container is built and up and running, run `docker exec -it airmail sh` to give you a shell into the
+After the container is built and up and running, run `docker exec -it airmail sh` to give you a shell into the container followed by `go run cmd/airmail/main.go` to start Airmail. By default it listens on `[::]:8081`.
 
+To fire some test request, use the ones from the included `.http` file in the `dev/` folder.
+
+Have fun! 🕺🏻💃🏻

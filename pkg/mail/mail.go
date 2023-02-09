@@ -24,6 +24,7 @@ type(
 	}
 
 	Email struct {
+		ContentType string `json:"content-type" form:"content-type"`
 		From party `json:"from" form:"from" validate:"required,dive"`
 		To []party `json:"to" form:"to" validate:"required,dive,required"`
 		Cc []party `json:"cc" form:"cc" validate:"dive"`
@@ -107,7 +108,8 @@ func buildMessage(sender string, receipients []string, subject string, message s
 	to := fmt.Sprintf("To: %s", joined_rcpts)
 	sub := fmt.Sprintf("Subject: %s", subject)
 
-	return strings.NewReader(from + "\r\n" +
+	return strings.NewReader("Content-type: text/html; charset=utf-8" + "\r\n" +
+		from + "\r\n" +
 		to + "\r\n" +
 		sub + "\r\n\r\n" +
 		message + "\r\n")

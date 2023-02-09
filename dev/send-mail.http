@@ -17,7 +17,7 @@ Content-Type: application/json
         }
     ],
     "subject": "This is a marvelous email",
-    "message": "This is some sample text.\n\rA new line is a good idea."
+    "message": "This is some sample text.\r\nA new line is a good idea."
 }
 
 ###
