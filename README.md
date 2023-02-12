@@ -1,3 +1,5 @@
+<a href="https://github.com/hedge10/airmail/actions/workflows/release.yml" target="_blank" rel="noopener"><img src="https://github.com/hedge10/airmail/actions/workflows/release.yml.badge.svg" alt="build" /></a>
+
 # Airmail
 
 ⚠️ This project is under heavy development. Please open an issue for questions and recommendations.
@@ -5,7 +7,14 @@
 
 Airmail is a small "form service" to be used for static pages contact forms. It takes your form submission and sends it to a SMTP server.
 
+## Installation
+
+Run Airmail as standalone app with of the [releases](https://github.com/hedge10/airmail/releases) for Linux, Windows or MacOS.
+
+
 ## Configuration
+
+The configuration is done by solely using environment variables.
 
 ### Airmail server
 
@@ -26,11 +35,9 @@ Set these environment variables to let Airmail connect to your SMTP:
 
 
 
-## Contributing
 
-Thank you for considering contributing. Please have a look at the following sections to help you setting up a local environment.
 
-### Development environment
+## Development
 
 Run `docker-compose up -d` in the root folder to build a local SMTP server and providing a small container running Airmail.
 
@@ -41,3 +48,8 @@ After the container is built and up and running, run `docker exec -it airmail sh
 To fire some test request, use the ones from the included `.http` file in the `dev/` folder.
 
 Have fun! 🕺🏻💃🏻
+
+
+## Contributing
+
+Thank you for considering contributing. Please have a look at the following sections to help you setting up a local environment.
