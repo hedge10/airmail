@@ -1,0 +1,4 @@
+.envrc
+
+# Goreleaser output folder
+dist/
