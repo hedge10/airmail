@@ -29,7 +29,7 @@ require (
 require (
 	github.com/emersion/go-smtp v0.16.0
 	github.com/go-playground/validator v9.31.0+incompatible
-	github.com/labstack/echo/v4 v4.10.0
+	github.com/labstack/echo/v4 v4.10.2
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mocktools/go-smtp-mock/v2 v2.0.5
