@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
-	"github.com/go-playground/validator"
-	"github.com/labstack/echo/v4"
-	echo_middleware "github.com/labstack/echo/v4/middleware"
+	"github.com/justinas/alice"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/hedge10/airmail/pkg/api"
@@ -19,17 +18,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	e := echo.New()
-	e.Validator = &api.CustomValidator{Validator: validator.New()}
-	e.Use(middleware.Config(cfg))
-	e.Use(middleware.LogRequest())
-	e.Use(middleware.EnforceContentType())
-	e.Use(echo_middleware.Gzip())
+	middlewares := alice.New(middleware.EnforceContentType)
 
-	// Register our routes
-	api.RegisterHandler(e, cfg)
+	mux := http.NewServeMux()
+	mux.Handle("/", middlewares.Then(api.IncomingMessageHandler(cfg)))
 
-	if err = e.Start(fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)); err != nil {
-		log.Fatal("Server failed")
+	address := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
+
+	serve_err := http.ListenAndServe(address, mux)
+	if serve_err != nil {
+		log.Fatal(serve_err)
 	}
 }

@@ -17,10 +17,12 @@ type Config struct {
 	SmtpAuth string `envconfig:"AM_SMTP_AUTH_MECHANISM" default:"none"`
 
 	Host string `envconfig:"AM_HOST" default:""`
-	Port int    `envconfig:"AM_PORT" default:"8081"`
+	Port int    `envconfig:"AM_PORT" default:"9900"`
 
 	Debug bool   `envconfig:"AM_DEBUG" default:"false"`
 	Env   string `envconfig:"AM_ENV" default:"dev"`
+
+	GrecaptchaSecret string `envconfig:"AM_GRECAPTCHA_SECRET" default:""`
 }
 
 var (
