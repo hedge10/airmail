@@ -1,4 +1,4 @@
-POST http://127.0.0.1:8081
+POST http://127.0.0.1:9900
 Content-Type: application/json
 
 {
@@ -22,24 +22,23 @@ Content-Type: application/json
 
 ###
 
-POST http://localhost:8081
+POST http://localhost:9900
 Content-Type: application/x-www-form-urlencoded
 
-{
-    "from": {
-        "name": "John",
-        "email": "john.doe@example.com"
-    },
-    "to": [
-        {
-            "name": "Batman & Robin",
-            "email": "batman_and_robin@warnerbros.com"
-        },
-        {
-            "name": "Pinky & the Brain",
-            "email": "pinky.and.the.brain@spielberg.com"
-        }
-    ],
-    "subject": "This is a marvelous email",
-    "message": "This is some sample text.\n\rA new line is a good idea."
-}
+sender-name=John
+&sender-address=john.doe@example.com
+&to[0].name=Batman + Robin
+&to[0].address=batman_and_robin@warnerbros.com
+&to[1].name=Mickey + Goofey
+&to[1].address=mickey_and_goofey@warnerbros.com
+&cc[0].name=Jack and Daniel
+&cc[0].address=jack_and_daniel@whiskey.com
+&cc[1].name=Tim and Struppi
+&cc[1].address=tim_struppi@example.com
+&bcc[0].name=Chip and Chap
+&bcc[0].address=chipchap@disney.com
+&bcc[1].name=Beauty and the Beast
+&bcc[1].address=bb@example.com
+&subject=This is a marvelous email
+&message=This is some sample text.\n\rA new line is a good idea.
+&_content-type=text

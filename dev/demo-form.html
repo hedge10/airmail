@@ -1,0 +1,124 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script>
+      function onSubmit(token) {
+        document.getElementById("demo-form").submit();
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container mx-auto max-w-lg mt-8">
+      <form
+        name="demo-form"
+        class="space-y-6"
+        method="post"
+        action="http://localhost:9900"
+      >
+        <div class="space-y-2">
+          <div class="text-xl font-medium">Sender</div>
+          <div>
+            <label for="name">Name</label>
+            <input
+              class="border p-1"
+              type="text"
+              id="sender-name"
+              name="from[name]"
+              placeholder="Sender name"
+              value="John Doe"
+            />
+          </div>
+          <div>
+            <label for="sender-email">Email</label>
+            <input
+              class="border p-1"
+              type="text"
+              id="sender-email"
+              name="from[email]"
+              placeholder="Sender email"
+              value="john.doe@example.com"
+            />
+          </div>
+        </div>
+        <div class="space-y-2">
+          <div class="text-xl font-medium">Receiver 1</div>
+          <div>
+            <label for="receiver-name1">Name1</label>
+            <input
+              class="border p-1"
+              type="text"
+              id="receiver-name1"
+              name="to[][name]"
+              value="Mr. Receiver1"
+            />
+          </div>
+          <div>
+            <label for="receiver-email1">Email1</label>
+            <input
+              class="border p-1"
+              type="text"
+              id="receiver-email1"
+              name="to[][email]"
+              value="receiver1@example.com"
+            />
+          </div>
+        </div>
+        <div class="space-y-2">
+          <div class="text-xl font-medium">Receiver 2</div>
+          <div>
+            <label for="receiver-name2">Name2</label>
+            <input
+              class="border p-1"
+              type="text"
+              id="receiver-name2"
+              name="to[][name]"
+              value="Mr. Receiver2"
+            />
+          </div>
+          <div>
+            <label for="receiver-email2">Email2</label>
+            <input
+              class="border p-1"
+              type="text"
+              id="receiver-email2"
+              name="to[][email]"
+              value="receiver2@example.com"
+            />
+          </div>
+        </div>
+        <div>
+          <label for="subject">Subject</label>
+          <input
+            class="border p-1"
+            type="text"
+            name="subject"
+            id="subject"
+            value="Test submission"
+          />
+        </div>
+        <div>
+          <label for="message">Message</label>
+          <textarea class="border p-1" name="message" id="subject">
+Demo text</textarea
+          >
+        </div>
+        <div
+          class="g-recaptcha"
+          data-sitekey="6LeIq6EkAAAAACs3T6d0skQ3KXUrWK3fm8_zWnTP"
+        ></div>
+        <div>
+          <button
+            type="submit"
+            class="border bg-blue-600 p-2 text-white font-bold rounded"
+            data-sitekey="6LeIq6EkAAAAACs3T6d0skQ3KXUrWK3fm8_zWnTP"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

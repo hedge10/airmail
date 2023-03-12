@@ -1,5 +1,5 @@
-style:
-    gofmt -w cmd pkg
+build:
+    goreleaser build --single-target --snapshot --clean
 
 check: style
     go vet ./...
@@ -7,6 +7,10 @@ check: style
 
 clean:
     go mod tidy
+
+style:
+    gofmt -w cmd pkg
+
 
 test:
     go test -v -cover ./...

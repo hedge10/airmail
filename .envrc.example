@@ -6,3 +6,5 @@ export AM_SMTP_PORT=1025
 export AM_SMTP_AUTH_MECHANISM=plain
 export AM_SMTP_USER=max
 export AM_SMTP_PASS=doe
+
+export AM_GRECAPTCHA_SECRET=""

@@ -1,0 +1,6 @@
+{
+    "success": false,
+    "challenge_ts": "2023-03-12T18:20:10Z",
+    "hostname": "localhost",
+    "error-codes": ["missing-input-secret"]
+}
