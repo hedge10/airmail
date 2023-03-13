@@ -35,6 +35,7 @@ type MessageRequest struct {
 	GrecaptchaResponse string `json:"g-recaptcha-response" form:"g-recaptcha-response"`
 
 	ContentType string `json:"_content-type" form:"_content-type"`
+	Redirect    string `json:"_redirect" form:"_redirect"`
 }
 
 var decoder *form.Decoder
@@ -67,13 +68,13 @@ func IncomingMessageHandler(config *conf.Config) http.Handler {
 		}
 
 		// Verify Google recaptcha
-		if config.GrecaptchaSecret != "" {
+		if len(config.GrecaptchaSecret) > 0 {
 			log.Info("Google Recaptcha active. Trying to validate...")
 			c, _ := CreateClient(BaseUri(GOOGLE_SITE_VERIFY))
 			r := c.ValidateGrecaptcha(config.GrecaptchaSecret, mr.GrecaptchaResponse, r.RemoteAddr)
 			if r != nil {
 				log.WithField("grecaptcha_error", r).Debug("Google Recaptcha validation failed.")
-				return
+				http.Error(w, "Google Recaptcha validation failed.", http.StatusUnprocessableEntity)
 			}
 		}
 
@@ -110,6 +111,10 @@ func IncomingMessageHandler(config *conf.Config) http.Handler {
 		}
 		if e != nil {
 			http.Error(w, e.Error(), http.StatusBadRequest)
+		}
+
+		if len(mr.Redirect) > 0 {
+			http.Redirect(w, r, mr.Redirect, http.StatusPermanentRedirect)
 		}
 	}
 

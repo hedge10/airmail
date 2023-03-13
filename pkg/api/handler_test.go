@@ -35,9 +35,14 @@ func teardown(s *smtpmock.Server) {
 	defer os.Unsetenv("AM_SMTP_PORT")
 }
 
-func TestIncomingMessageHandlerWithFormData(t *testing.T) {
-	s := setup(t)
+func getFormValuesWithRedirect(redirect string) url.Values {
+	form := getFormValues()
+	form.Add("_redirect", redirect)
 
+	return form
+}
+
+func getFormValues() url.Values {
 	form := url.Values{}
 	form.Add("sender-address", "john.doe@example.com")
 	form.Add("to[0].address", "jane.doe@example.com")
@@ -47,7 +52,15 @@ func TestIncomingMessageHandlerWithFormData(t *testing.T) {
 	form.Add("subject", "Sample email subject")
 	form.Add("message", "A hilarious message.")
 
+	return form
+}
+
+func TestIncomingMessageHandlerWithFormData(t *testing.T) {
+	s := setup(t)
+
 	config, _ := conf.New()
+
+	form := getFormValues()
 
 	r := httptest.NewRequest("POST", "/", strings.NewReader(form.Encode()))
 	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -56,6 +69,24 @@ func TestIncomingMessageHandlerWithFormData(t *testing.T) {
 	IncomingMessageHandler(config).ServeHTTP(w, r)
 
 	assert.Equal(t, 200, w.Result().StatusCode)
+
+	teardown(s)
+}
+
+func TestIncomingMessageHandlerWithFormDataAndRedirectUrl(t *testing.T) {
+	s := setup(t)
+
+	config, _ := conf.New()
+
+	form := getFormValuesWithRedirect("http://www.google.com")
+
+	r := httptest.NewRequest("POST", "/", strings.NewReader(form.Encode()))
+	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+
+	IncomingMessageHandler(config).ServeHTTP(w, r)
+
+	assert.Equal(t, 308, w.Result().StatusCode)
 
 	teardown(s)
 }
