@@ -9,6 +9,8 @@ import (
 	"github.com/go-playground/form"
 	"github.com/hedge10/airmail/pkg/conf"
 	"github.com/hedge10/airmail/pkg/mail"
+	"github.com/invopop/validation"
+	"github.com/invopop/validation/is"
 	"github.com/mholt/binding"
 
 	log "github.com/sirupsen/logrus"
@@ -21,16 +23,16 @@ const (
 
 type Person struct {
 	Name    string `json:"name" form:"name"`
-	Address string `json:"address" form:"address" validate:"required,email"`
+	Address string `json:"address" form:"address"`
 }
 type MessageRequest struct {
 	SenderName    string   `json:"sender-name" form:"sender-name"`
-	SenderAddress string   `json:"sender-address" form:"sender-address" validate:"required,email"`
+	SenderAddress string   `json:"sender-address" form:"sender-address"`
 	To            []Person `json:"to" form:"to"`
 	Cc            []Person `json:"cc" form:"cc"`
 	Bcc           []Person `json:"bcc" form:"bcc"`
-	Subject       string   `json:"subject" form:"subject" validate:"required"`
-	Message       string   `json:"message" form:"message" validate:"required"`
+	Subject       string   `json:"subject" form:"subject"`
+	Message       string   `json:"message" form:"message"`
 
 	GrecaptchaResponse string `json:"g-recaptcha-response" form:"g-recaptcha-response"`
 
@@ -45,6 +47,36 @@ func (mr *MessageRequest) FieldMap(req *http.Request) binding.FieldMap {
 		&mr.SenderName: "sender-name",
 	}
 }
+
+func (mr MessageRequest) Validate() error {
+	rules := []*validation.FieldRules{
+		validation.Field(&mr.SenderAddress, validation.Required, is.Email),
+		validation.Field(&mr.ContentType, validation.In("html", "text")),
+		validation.Field(&mr.Redirect, is.URL),
+	}
+
+	// Extra handling for []person type
+	// pV := map[string][]validation.Rule{
+	// 	"Address": {validation.Required, is.Email},
+	// }
+	// rules = append(rules, validateNestedPerson(mr.To, pV)...)
+
+	return validation.ValidateStruct(&mr, rules...)
+}
+
+// func validateNestedPerson(target []Person, rules map[string][]validation.Rule) []*validation.FieldRules {
+// 	fr := []*validation.FieldRules{}
+
+// 	for _, e := range target {
+// 		for ri, re := range rules {
+// 			r := reflect.ValueOf(e)
+
+// 			fr = append(fr, validation.Field(reflect.Indirect(r).FieldByName(ri), re...))
+// 		}
+// 	}
+
+// 	return fr
+// }
 
 func IncomingMessageHandler(config *conf.Config) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
@@ -67,6 +99,13 @@ func IncomingMessageHandler(config *conf.Config) http.Handler {
 			return
 		}
 
+		// Validation
+		err := mr.Validate()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+			return
+		}
+
 		// Verify Google recaptcha
 		if len(config.GrecaptchaSecret) > 0 {
 			log.Info("Google Recaptcha active. Trying to validate...")
@@ -75,6 +114,7 @@ func IncomingMessageHandler(config *conf.Config) http.Handler {
 			if r != nil {
 				log.WithField("grecaptcha_error", r).Debug("Google Recaptcha validation failed.")
 				http.Error(w, "Google Recaptcha validation failed.", http.StatusUnprocessableEntity)
+				return
 			}
 		}
 

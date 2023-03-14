@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/smartystreets/goconvey v1.7.2 // indirect
@@ -19,6 +20,7 @@ require (
 
 require (
 	github.com/emersion/go-smtp v0.16.0
+	github.com/invopop/validation v0.3.0
 	github.com/justinas/alice v1.2.0
 	github.com/mholt/binding v0.3.0
 	github.com/mocktools/go-smtp-mock/v2 v2.0.5

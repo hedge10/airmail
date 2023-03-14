@@ -2,10 +2,12 @@ package api
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -57,6 +59,7 @@ func getFormValues() url.Values {
 
 func TestIncomingMessageHandlerWithFormData(t *testing.T) {
 	s := setup(t)
+	defer teardown(s)
 
 	config, _ := conf.New()
 
@@ -69,12 +72,11 @@ func TestIncomingMessageHandlerWithFormData(t *testing.T) {
 	IncomingMessageHandler(config).ServeHTTP(w, r)
 
 	assert.Equal(t, 200, w.Result().StatusCode)
-
-	teardown(s)
 }
 
 func TestIncomingMessageHandlerWithFormDataAndRedirectUrl(t *testing.T) {
 	s := setup(t)
+	defer teardown(s)
 
 	config, _ := conf.New()
 
@@ -87,12 +89,11 @@ func TestIncomingMessageHandlerWithFormDataAndRedirectUrl(t *testing.T) {
 	IncomingMessageHandler(config).ServeHTTP(w, r)
 
 	assert.Equal(t, 308, w.Result().StatusCode)
-
-	teardown(s)
 }
 
 func TestIncomingMessageHandlerWithJsonData(t *testing.T) {
 	s := setup(t)
+	defer teardown(s)
 
 	json := []byte(`{
 		"sender-address": "john.doe@example.com",
@@ -133,12 +134,11 @@ func TestIncomingMessageHandlerWithJsonData(t *testing.T) {
 	IncomingMessageHandler(config).ServeHTTP(w, r)
 
 	assert.Equal(t, 200, w.Result().StatusCode)
-
-	teardown(s)
 }
 
 func TestIncomingMessageHandlerWithUnknownContentType(t *testing.T) {
 	s := setup(t)
+	defer teardown(s)
 
 	config, _ := conf.New()
 
@@ -148,6 +148,45 @@ func TestIncomingMessageHandlerWithUnknownContentType(t *testing.T) {
 	IncomingMessageHandler(config).ServeHTTP(w, r)
 
 	assert.Equal(t, 200, w.Result().StatusCode)
+}
 
-	teardown(s)
+func TestValidation(t *testing.T) {
+	s := setup(t)
+	defer teardown(s)
+
+	type test struct {
+		mr   MessageRequest
+		want error
+	}
+
+	tests := []test{
+		{
+			mr: MessageRequest{
+				SenderAddress: "",
+			},
+			want: errors.New("sender-address: cannot be blank."),
+		},
+		{
+			mr: MessageRequest{
+				SenderAddress: "john.doe@example.com",
+				Redirect:      "lala",
+			},
+			want: errors.New("_redirect: must be a valid URL."),
+		},
+		{
+			mr: MessageRequest{
+				SenderAddress: "john.doe@example.com",
+				Redirect:      "http://www.example.com",
+				ContentType:   "invalid",
+			},
+			want: errors.New("_content-type: must be a valid value."),
+		},
+	}
+
+	for _, tc := range tests {
+		got := tc.mr.Validate()
+		if !reflect.DeepEqual(tc.want.Error(), got.Error()) {
+			t.Fatalf("expected: %v, got: %v", tc.want.Error(), got.Error())
+		}
+	}
 }

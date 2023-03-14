@@ -42,3 +42,4 @@ sender-name=John
 &subject=This is a marvelous email
 &message=This is some sample text.\n\rA new line is a good idea.
 &_content-type=text
+&_redirect=text
