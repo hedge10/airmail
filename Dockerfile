@@ -1,7 +1,5 @@
 FROM golang:1.20-alpine3.17 AS builder
 
-LABEL org.opencontainers.image.source="https://github.com/hedge10/airmail"
-
 ARG VERSION=SNAPSHOT
 ENV CGO_ENABLED=0
 
@@ -16,6 +14,8 @@ COPY . /workspace/
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-X 'github.com/hedge10/airmail.Version=$VERSION'" -o airmail ./cmd/airmail
 
 FROM gcr.io/distroless/static
+
+LABEL org.opencontainers.image.source="https://github.com/hedge10/airmail"
 
 COPY --from=builder /workspace/airmail .
 
