@@ -1,27 +1,24 @@
-FROM axllent/mailpit:latest as mailpit
+FROM golang:1.20-alpine3.17 AS builder
 
-FROM golang:1.19-alpine
+LABEL org.opencontainers.image.source="https://github.com/hedge10/airmail"
 
-WORKDIR /root
+ARG VERSION=SNAPSHOT
+ENV CGO_ENABLED=0
 
-COPY ./dev/docker/openssl.cnf /root/openssl.cnf
+WORKDIR /workspace
 
-# Create self-signed certificate to run SMTP server (mailpit) with TLS
-RUN apk add --no-cache direnv openssl \
-    && rm -rf /var/cache/apk/*
-RUN openssl req -x509 -newkey rsa:4096 -nodes -keyout privkey.pem -out airmail.pem -sha256 -days 365 -config /root/openssl.cnf
+COPY go.mod go.sum /workspace/
 
-RUN cp airmail.pem /usr/local/share/ca-certificates/airmail.crt \
-    && update-ca-certificates
+RUN go mod download
 
-COPY --from=mailpit /mailpit /usr/local/bin/mailpit
+COPY . /workspace/
 
-RUN chmod +x /usr/local/bin/mailpit
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-X 'github.com/hedge10/airmail.Version=$VERSION'" -o airmail ./cmd/airmail
 
-COPY ./dev/docker/entrypoint.sh /root/entrypoint.sh
-RUN chmod +x /root/entrypoint.sh
+FROM gcr.io/distroless/static
 
-WORKDIR /app
+COPY --from=builder /workspace/airmail .
 
-ENTRYPOINT ["/root/entrypoint.sh"]
+EXPOSE 9900
 
+ENTRYPOINT [ "/airmail" ]
