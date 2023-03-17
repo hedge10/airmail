@@ -28,7 +28,7 @@ jobs:
           password: ${{ secrets.RELEASE_PAT }}
 
       - name: Push to GH Container Registry
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: .
           registry: ghcr.io
