@@ -21,7 +21,7 @@ jobs:
           images: ghcr.io/hedge10/airmail
 
       - name: Login to GH Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: hedge10
