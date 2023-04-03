@@ -6,6 +6,7 @@ import (
 
 	"github.com/emersion/go-sasl"
 	"github.com/emersion/go-smtp"
+	"github.com/qiniu/qmgo/field"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -36,15 +37,15 @@ type (
 	}
 
 	Email struct {
-		Connection  Connection
-		Meta        Meta
-		ContentType string
-		From        Party
-		To          []Party
-		Cc          []Party
-		Bcc         []Party
-		Subject     string
-		Message     string
+		field.DefaultField `bson:",inline"`
+		Connection         Connection
+		Meta               Meta
+		From               Party
+		To                 []Party
+		Cc                 []Party
+		Bcc                []Party
+		Subject            string
+		Message            string
 	}
 )
 

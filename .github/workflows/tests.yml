@@ -4,14 +4,25 @@ on: [push, pull_request]
 jobs:
   go-test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out source code
         uses: actions/checkout@v3
+
+      - name: Start MongoDB v${{ matrix.mongodb-version }}
+        uses: supercharge/mongodb-github-action@1.8.0
+        with:
+          mongodb-version: 6.0.5
+          mongodb-username: root
+          mongodb-password: root
+          mongodb-db: airmail
+
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version-file: "go.mod"
           cache: true
+
       - name: Setup just
         uses: extractions/setup-just@v1
         env:

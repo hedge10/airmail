@@ -9,6 +9,7 @@ import (
 	"github.com/go-playground/form"
 	"github.com/hedge10/airmail/pkg/conf"
 	"github.com/hedge10/airmail/pkg/mail"
+	"github.com/hedge10/airmail/pkg/storage"
 	"github.com/invopop/validation"
 	"github.com/invopop/validation/is"
 	"github.com/mholt/binding"
@@ -78,7 +79,7 @@ func (mr MessageRequest) Validate() error {
 // 	return fr
 // }
 
-func IncomingMessageHandler(config *conf.Config) http.Handler {
+func IncomingMessageHandler(config *conf.Config, storage *storage.Storage) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		var mr *MessageRequest
 
@@ -151,6 +152,15 @@ func IncomingMessageHandler(config *conf.Config) http.Handler {
 		}
 		if e != nil {
 			http.Error(w, e.Error(), http.StatusBadRequest)
+		}
+
+		// Successfully sent the message, now store it
+		if storage != nil {
+			storage.Message = m
+			err := storage.Insert()
+			if err != nil {
+				log.WithField("error", err).Error("Message was not saved.")
+			}
 		}
 
 		if len(mr.Redirect) > 0 {
