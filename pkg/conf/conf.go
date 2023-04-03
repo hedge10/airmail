@@ -23,24 +23,34 @@ type Config struct {
 	Env   string `envconfig:"AM_ENV" default:"dev"`
 
 	GrecaptchaSecret string `envconfig:"AM_GRECAPTCHA_SECRET" default:""`
+
+	UseStorage        bool   `envconfig:"AM_USE_STORAGE" default:"false"`
+	StorageType       string `envconfig:"AM_STORAGE_TYPE" default:"mongodb"`
+	MongoDbHost       string `envconfig:"AM_MONGODB_HOST" default:"localhost"`
+	MongoDbPort       int    `envconfig:"AM_MONGODB_PORT" default:"27017"`
+	MongoDbDatabase   string `envconfig:"AM_MONGODB_DB" default:"airmail"`
+	MongoDbCollection string `envconfig:"AM_MONGODB_COLLECTION" default:"messages"`
+	MongoDbUsername   string `envconfig:"AM_MONGODB_USERNAME" default:""`
+	MongoDbPassword   string `envconfig:"AM_MONGODB_PASSWORD" default:""`
 }
 
 var (
 	ErrCannotConnectToSmtp = errors.New("Cannot connect to SMTP server. Please check the connection details.")
 )
 
-func isValidAuthMechanism(mechanism string) bool {
-	switch mechanism {
+func isValidAuthMechanism(cfg *Config) error {
+	switch cfg.SmtpAuth {
 	case mail.AUTH_NONE, mail.AUTH_PLAIN, mail.AUTH_LOGIN, mail.AUTH_CRAM_MD5, mail.AUTH_NTLM:
-		return true
+		return nil
 	}
 
-	return false
+	return errors.New(fmt.Sprintf("The authentication mechanism '%s' is unknown. Supported values are: %s, %s, %s, %s, %s.", cfg.SmtpAuth, mail.AUTH_NONE, mail.AUTH_LOGIN, mail.AUTH_PLAIN, mail.AUTH_CRAM_MD5, mail.AUTH_NTLM))
 }
 
 func (cfg *Config) validate() error {
-	if !isValidAuthMechanism(cfg.SmtpAuth) {
-		return errors.New(fmt.Sprintf("The authentication mechanism '%s' is unknown. Supported values are: %s, %s, %s, %s, %s.", cfg.SmtpAuth, mail.AUTH_NONE, mail.AUTH_LOGIN, mail.AUTH_PLAIN, mail.AUTH_CRAM_MD5, mail.AUTH_NTLM))
+	err := isValidAuthMechanism(cfg)
+	if err != nil {
+		return err
 	}
 
 	return nil
