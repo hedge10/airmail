@@ -4,6 +4,24 @@ on: [push, pull_request]
 jobs:
   go-test:
     runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+          image: mongo:6.0
+          env:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: root
+            MONGO_INITDB_DATABASE: test
+          options: >-
+            --health-cmd mongo
+            --health-interval 5s
+            --health-timeout 3s
+            --health-retries 3
+          ports:
+            - 27017:27017
+          volumes:
+            - ${GITHUB_WORKSPACE}/docker/mongo/init.js:/docker-entrypoint-initdb.d/mongo-init.js
+
     steps:
       - name: Check out source code
         uses: actions/checkout@v3

@@ -69,7 +69,7 @@ func TestIncomingMessageHandlerWithFormData(t *testing.T) {
 	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	w := httptest.NewRecorder()
 
-	IncomingMessageHandler(config).ServeHTTP(w, r)
+	IncomingMessageHandler(config, nil).ServeHTTP(w, r)
 
 	assert.Equal(t, 200, w.Result().StatusCode)
 }
@@ -86,7 +86,7 @@ func TestIncomingMessageHandlerWithFormDataAndRedirectUrl(t *testing.T) {
 	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	w := httptest.NewRecorder()
 
-	IncomingMessageHandler(config).ServeHTTP(w, r)
+	IncomingMessageHandler(config, nil).ServeHTTP(w, r)
 
 	assert.Equal(t, 308, w.Result().StatusCode)
 }
@@ -131,7 +131,7 @@ func TestIncomingMessageHandlerWithJsonData(t *testing.T) {
 	r.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
 
-	IncomingMessageHandler(config).ServeHTTP(w, r)
+	IncomingMessageHandler(config, nil).ServeHTTP(w, r)
 
 	assert.Equal(t, 200, w.Result().StatusCode)
 }
@@ -145,7 +145,7 @@ func TestIncomingMessageHandlerWithUnknownContentType(t *testing.T) {
 	r := httptest.NewRequest("POST", "/", nil)
 	w := httptest.NewRecorder()
 
-	IncomingMessageHandler(config).ServeHTTP(w, r)
+	IncomingMessageHandler(config, nil).ServeHTTP(w, r)
 
 	assert.Equal(t, 200, w.Result().StatusCode)
 }

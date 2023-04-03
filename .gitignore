@@ -1,4 +1,8 @@
 .envrc
+*.db
 
 # Goreleaser output folder
-dist/
+/dist
+
+# AIR
+/tmp

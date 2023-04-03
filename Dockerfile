@@ -1,24 +1,44 @@
-FROM golang:1.20-alpine3.17 AS builder
-
+FROM golang:1.20-alpine3.17 AS base
 ARG VERSION=SNAPSHOT
 ENV CGO_ENABLED=0
 
-WORKDIR /workspace
+WORKDIR /app
 
-COPY go.mod go.sum /workspace/
+COPY . /app/
 
-RUN go mod download
+RUN go mod download \
+    && CGO_ENABLED=0 GOOS=linux go build -ldflags="-X 'github.com/hedge10/airmail.Version=$VERSION'" -o airmail ./cmd/airmail
 
-COPY . /workspace/
-
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-X 'github.com/hedge10/airmail.Version=$VERSION'" -o airmail ./cmd/airmail
-
-FROM gcr.io/distroless/static
-
+FROM gcr.io/distroless/static AS prod
 LABEL org.opencontainers.image.source="https://github.com/hedge10/airmail"
 
-COPY --from=builder /workspace/airmail .
+COPY --from=base /app/airmail .
 
 EXPOSE 9900
 
 ENTRYPOINT [ "/airmail" ]
+
+FROM prod AS dev
+
+RUN apk add --no-cache curl direnv openssl \
+    && openssl req -x509 -newkey rsa:4096 -nodes -keyout privkey.pem -out airmail.pem -sha256 -days 365 -config /root/openssl.cnf \
+    && cp airmail.pem /usr/local/share/ca-certificates/airmail.crt \
+    && update-ca-certificates
+
+COPY --from=axllent/mailpit /mailpit /usr/local/bin/mailpit
+RUN chmod +x /usr/local/bin/mailpit
+
+COPY ./docker/entrypoint.sh /root/entrypoint.sh
+RUN chmod +x /root/entrypoint.sh
+
+# Install AIR
+WORKDIR /
+RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s
+
+WORKDIR /app
+
+EXPOSE 9900
+
+ENTRYPOINT ["sh", "-c", "/bin/air"]
+
+

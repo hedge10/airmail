@@ -10,6 +10,7 @@ import (
 	"github.com/hedge10/airmail/pkg/api"
 	"github.com/hedge10/airmail/pkg/conf"
 	"github.com/hedge10/airmail/pkg/middleware"
+	"github.com/hedge10/airmail/pkg/storage"
 )
 
 func main() {
@@ -18,10 +19,15 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var s *storage.Storage
+	if cfg.UseStorage {
+		s, _ = storage.Connect(cfg)
+	}
+
 	middlewares := alice.New(middleware.EnforceContentType)
 
 	mux := http.NewServeMux()
-	mux.Handle("/", middlewares.Then(api.IncomingMessageHandler(cfg)))
+	mux.Handle("/", middlewares.Then(api.IncomingMessageHandler(cfg, s)))
 
 	address := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
 

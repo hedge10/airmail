@@ -11,7 +11,6 @@ clean:
 style:
     gofmt -w cmd pkg
 
-
 test:
     go test -v -cover ./...
 
