@@ -8,44 +8,23 @@
 
 Airmail is a small "form service" to be used for static pages contact forms. It takes your form submission and sends it to a SMTP server.
 
-## Installation
-
-Run Airmail as standalone app with of the [releases](https://github.com/hedge10/airmail/releases) for Linux, Windows or MacOS.
-
-## Configuration
-
-The configuration is done by solely using environment variables.
-
-### Airmail server
-
-You can configure to which IP and Port Airmail should bind the webserver with these environment variables:
-
--   `AM_HOST`, default: `127.0.0.1`
--   `AM_PORT`, default: `8081`
-
-### SMTP connection
-
-Set these environment variables to let Airmail connect to your SMTP:
-
--   `AM_SMTP_HOST`, default: `localhost`
--   `AM_SMTP_PORT`, default: `25`
--   `AM_SMTP_USER`, default: `<empty>`
--   `AM_SMTP_PASS`, default: `<empty>`
--   `AM_SMTP_AUTH_MECHANISM`, default: `none` (choose between `none`, `plain`, `login`, `cram-md5`, `ntlm`)
+Find all about installation and configuration of _Airmail_ on https://docs.viaairmail.de/.
 
 ## Development
 
-Run `docker-compose up -d` in the root folder to build a local SMTP server and providing a small container running Airmail.
+Prerequites:
 
-The SMTP server is based on [Mailpit](https://github.com/axllent/mailpit), running the server on port `1025` and the web interface on `http://localhost:8025`. Make sure these ports are not already in use by your host system.
+-   [just](https://github.com/casey/just) command runner
 
-After the container is built and up and running, run `docker exec -it airmail sh` to give you a shell into the container followed by `go run cmd/airmail/main.go` to start Airmail. By default it listens on `[::]:8081`.
+:info: You can use the development setup without using `just`. Have a look into the [`justfile`](./justfile) for individual commands.
 
-To fire some test request, use the ones from the included `.http` file in the `dev/` folder.
+Run `just up` in the root folder to spin up the following Docker container:
 
-Instead of using a Makefile, [just](https://just.systems/) (and a justfile 😉) is used.
+-   Airmail: the code is mirrored inside and live-reloaded via [Air](https://github.com/cosmtrek/air). Reach _Airmail_ via `http://localhost:9900`. Additionally this container also provides the local SMTP server [Mailpit](https://github.com/axllent/mailpit) reachable via `http://localhost:8025`
+-   MongoDB: a container running MongoDB
+-   Mongo Express: A small UI for managing MongoDB and inspecting collections reachable via `http://localhost:8888`
 
-Have fun! 🕺🏻💃🏻
+Happy coding fun! 🕺🏻💃🏻
 
 ## Contributing
 

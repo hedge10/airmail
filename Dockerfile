@@ -18,9 +18,13 @@ EXPOSE 9900
 
 ENTRYPOINT [ "/airmail" ]
 
-FROM prod AS dev
+FROM base AS dev
 
-RUN apk add --no-cache curl direnv openssl \
+WORKDIR /root
+COPY ./docker/entrypoint.sh ./docker/openssl.cnf ./
+RUN chmod +x /root/entrypoint.sh
+
+RUN apk add --no-cache curl direnv openssl\
     && openssl req -x509 -newkey rsa:4096 -nodes -keyout privkey.pem -out airmail.pem -sha256 -days 365 -config /root/openssl.cnf \
     && cp airmail.pem /usr/local/share/ca-certificates/airmail.crt \
     && update-ca-certificates
@@ -28,17 +32,12 @@ RUN apk add --no-cache curl direnv openssl \
 COPY --from=axllent/mailpit /mailpit /usr/local/bin/mailpit
 RUN chmod +x /usr/local/bin/mailpit
 
-COPY ./docker/entrypoint.sh /root/entrypoint.sh
-RUN chmod +x /root/entrypoint.sh
-
 # Install AIR
 WORKDIR /
 RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s
 
 WORKDIR /app
 
-EXPOSE 9900
-
-ENTRYPOINT ["sh", "-c", "/bin/air"]
+ENTRYPOINT ["/bin/bash", "-c", "/bin/air"]
 
 

@@ -6,10 +6,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: dev
     ports:
       - "1025:1025"
       - "8025:8025"
-      - "8081:8081"
+      - "9900:9900"
     volumes:
       - ./:/app
     environment:
@@ -26,8 +27,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
-    volumes:
-      - ./docker/mongo/init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
   mongo-express:
     image: mongo-express
     restart: always
