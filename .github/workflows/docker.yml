@@ -36,3 +36,4 @@ jobs:
           build-args: |
             VERSION=${{ env.AIRMAIL_VERSION }}
           tags: ${{ steps.docker_meta.outputs.tags }}
+          target: prod
