@@ -17,12 +17,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - run: git tag ${{ github.event.inputs.tag }}
+      - name: Start MongoDB v${{ matrix.mongodb-version }}
+        uses: supercharge/mongodb-github-action@1.8.0
+        with:
+          mongodb-version: 6.0.5
+          mongodb-username: root
+          mongodb-password: root
+          mongodb-db: airmail
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '>=1.19.0'
+          go-version: '>=1.20.0'
           cache: true
 
       - name: Run linter
@@ -32,6 +38,8 @@ jobs:
 
       - name: Run tests
         run: go test ./...
+
+      - run: git tag ${{ github.event.inputs.tag }}
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
