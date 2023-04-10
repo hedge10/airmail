@@ -40,11 +40,11 @@ var (
 
 func isValidAuthMechanism(cfg *Config) error {
 	switch cfg.SmtpAuth {
-	case mail.AUTH_NONE, mail.AUTH_PLAIN, mail.AUTH_LOGIN, mail.AUTH_CRAM_MD5, mail.AUTH_NTLM:
+	case mail.AUTH_NONE, mail.AUTH_PLAIN, mail.AUTH_LOGIN:
 		return nil
 	}
 
-	return errors.New(fmt.Sprintf("The authentication mechanism '%s' is unknown. Supported values are: %s, %s, %s, %s, %s.", cfg.SmtpAuth, mail.AUTH_NONE, mail.AUTH_LOGIN, mail.AUTH_PLAIN, mail.AUTH_CRAM_MD5, mail.AUTH_NTLM))
+	return errors.New(fmt.Sprintf("The authentication mechanism '%s' is unknown. Supported values are: %s, %s, %s.", cfg.SmtpAuth, mail.AUTH_NONE, mail.AUTH_LOGIN, mail.AUTH_PLAIN))
 }
 
 func (cfg *Config) validate() error {

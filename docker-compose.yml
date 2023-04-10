@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 
 services:
   airmail:
@@ -16,9 +16,11 @@ services:
     environment:
       - AM_ENV=dev
       - AM_DEBUG=false
-      - AM_SMTP_HOST=localhost
-      - AM_SMTP_PORT=1025
-      - AM_SMTP_AUTH_MECHANISM=none
+      - AM_SMTP_HOST=${AM_SMTP_HOST}
+      - AM_SMTP_PORT=${AM_SMTP_PORT}
+      - AM_SMTP_USER=${AM_SMTP_USER}
+      - AM_SMTP_PASS=${AM_SMTP_PASS}
+      - AM_SMTP_AUTH_MECHANISM=${AM_SMTP_AUTH_MECHANISM}
   mongo:
     image: mongo:6.0
     restart: always

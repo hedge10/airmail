@@ -20,7 +20,7 @@ func TestValidateAuthMechanism(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(
 		t,
-		fmt.Sprintf("Failed validation of config: The authentication mechanism '%s' is unknown. Supported values are: %s, %s, %s, %s, %s.", "unknown-auth", mail.AUTH_NONE, mail.AUTH_LOGIN, mail.AUTH_PLAIN, mail.AUTH_CRAM_MD5, mail.AUTH_NTLM),
+		fmt.Sprintf("Failed validation of config: The authentication mechanism '%s' is unknown. Supported values are: %s, %s, %s.", "unknown-auth", mail.AUTH_NONE, mail.AUTH_LOGIN, mail.AUTH_PLAIN),
 		err.Error(),
 	)
 }
