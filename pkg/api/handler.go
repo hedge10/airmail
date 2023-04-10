@@ -55,29 +55,24 @@ func (mr MessageRequest) Validate() error {
 		validation.Field(&mr.ContentType, validation.In("html", "text")),
 		validation.Field(&mr.Redirect, is.URL),
 	}
+	err := validation.ValidateStruct(&mr, rules...)
+	if err != nil {
+		return err
+	}
 
-	// Extra handling for []person type
-	// pV := map[string][]validation.Rule{
-	// 	"Address": {validation.Required, is.Email},
-	// }
-	// rules = append(rules, validateNestedPerson(mr.To, pV)...)
+	// Separately validating the receivers, as the built-in logic for nested structs was not that obvious
+	// See https://github.com/invopop/validation/issues/3
+	for _, el := range mr.To {
+		err = validation.Errors{
+			"receiver address": validation.Validate(el.Address, validation.Required, is.Email),
+		}.Filter()
+		if err != nil {
+			return err
+		}
+	}
 
-	return validation.ValidateStruct(&mr, rules...)
+	return nil
 }
-
-// func validateNestedPerson(target []Person, rules map[string][]validation.Rule) []*validation.FieldRules {
-// 	fr := []*validation.FieldRules{}
-
-// 	for _, e := range target {
-// 		for ri, re := range rules {
-// 			r := reflect.ValueOf(e)
-
-// 			fr = append(fr, validation.Field(reflect.Indirect(r).FieldByName(ri), re...))
-// 		}
-// 	}
-
-// 	return fr
-// }
 
 func IncomingMessageHandler(config *conf.Config, storage *storage.Storage) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
@@ -143,11 +138,12 @@ func IncomingMessageHandler(config *conf.Config, storage *storage.Storage) http.
 			Subject: mr.Subject,
 			Message: mr.Message,
 		}
+
 		var e error
 		if config.SmtpAuth == mail.AUTH_NONE {
 			e = m.SendWithoutAuth()
 		} else {
-			m.Connection.Client = mail.CreateClient(config.SmtpAuth)
+			m.Connection.Client = mail.CreateClient(config.SmtpAuth, config.SmtpUser, config.SmtpPass)
 			e = m.Send()
 		}
 		if e != nil {

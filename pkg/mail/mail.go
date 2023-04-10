@@ -1,6 +1,7 @@
 package mail
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -11,11 +12,9 @@ import (
 )
 
 const (
-	AUTH_NONE     string = "none"
-	AUTH_PLAIN    string = "plain"
-	AUTH_CRAM_MD5 string = "cram-md5"
-	AUTH_LOGIN    string = "login"
-	AUTH_NTLM     string = "ntlm"
+	AUTH_NONE  string = "none"
+	AUTH_PLAIN string = "plain"
+	AUTH_LOGIN string = "login"
 
 	CT_HTML  string = "text/html"
 	CT_PLAIN string = "text/plain"
@@ -49,14 +48,14 @@ type (
 	}
 )
 
-func CreateClient(auth_mechanism string) sasl.Client {
-	if auth_mechanism == AUTH_LOGIN {
-		log.Debug(fmt.Sprintf("Using %s method for authentication", AUTH_LOGIN))
-		return sasl.NewLoginClient("", "")
+func CreateClient(auth string, user string, pass string) sasl.Client {
+	log.Debug(fmt.Sprintf("Using '%s' method for authentication", auth))
+
+	if auth == AUTH_LOGIN {
+		return sasl.NewLoginClient(user, pass)
 	}
 
-	log.Debug(fmt.Sprintf("Using %s method for authentication", AUTH_PLAIN))
-	return sasl.NewPlainClient("", "", "")
+	return sasl.NewPlainClient("", user, pass)
 }
 
 func (e Email) Send() error {
@@ -64,11 +63,14 @@ func (e Email) Send() error {
 	receivers := buildReceivers(e.To)
 	message := buildMessage(sender, receivers, buildRawReceivers(e.Cc), buildRawReceivers(e.Bcc), e.Subject, e.Message, e.Meta.ContentType)
 
-	log.Info("Sending mail to SMTP")
-	log.Info(e.Connection.Address)
+	if e.Connection.Client == nil {
+		log.Warn("no authentication client initialized.")
+		return errors.New("no authentication client initialized")
+	}
+
 	err := smtp.SendMail(e.Connection.Address, e.Connection.Client, sender, receivers, message)
 	if err != nil {
-		log.Error(err)
+		log.WithField("smtp_error", err).Error("Sending mail failed")
 	}
 
 	return err
@@ -91,8 +93,8 @@ func (e Email) SendWithoutAuth() error {
 	log.Info(e.Connection.Address)
 	error := c.SendMail(sender, receivers, message)
 
-	if error != nil {
-		log.Error(error)
+	if err != nil {
+		log.WithField("smtp_error", err).Error("Sending mail failed")
 	}
 
 	return error
@@ -117,7 +119,7 @@ func buildReceivers(to []Party) []string {
 		}
 	}
 
-	log.Debug(fmt.Sprintf("Built %d receivers", len(receivers)))
+	log.WithField("receivers", receivers).Debug(fmt.Sprintf("Built %d receivers", len(receivers)))
 
 	return receivers
 }
@@ -128,7 +130,7 @@ func buildRawReceivers(to []Party) []string {
 		receivers = append(receivers, el.Email)
 	}
 
-	log.Debug(fmt.Sprintf("Built %d raw receivers", len(receivers)))
+	log.WithField("raw_receivers", receivers).Debug(fmt.Sprintf("Built %d raw receivers", len(receivers)))
 
 	return receivers
 }

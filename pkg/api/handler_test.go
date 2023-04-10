@@ -169,6 +169,27 @@ func TestValidation(t *testing.T) {
 		{
 			mr: MessageRequest{
 				SenderAddress: "john.doe@example.com",
+				To: []Person{
+					{},
+				},
+			},
+			want: errors.New("receiver address: cannot be blank."),
+		},
+		{
+			mr: MessageRequest{
+				SenderAddress: "john.doe@example.com",
+				To: []Person{
+					{
+						Name:    "",
+						Address: "invalid",
+					},
+				},
+			},
+			want: errors.New("receiver address: must be a valid email address."),
+		},
+		{
+			mr: MessageRequest{
+				SenderAddress: "john.doe@example.com",
 				Redirect:      "lala",
 			},
 			want: errors.New("_redirect: must be a valid URL."),
