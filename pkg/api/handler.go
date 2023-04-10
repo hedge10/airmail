@@ -138,10 +138,8 @@ func IncomingMessageHandler(config *conf.Config, storage *storage.Storage) http.
 			Subject: mr.Subject,
 			Message: mr.Message,
 		}
+
 		var e error
-
-		log.Info("auth is lala .. " + config.SmtpAuth)
-
 		if config.SmtpAuth == mail.AUTH_NONE {
 			e = m.SendWithoutAuth()
 		} else {
