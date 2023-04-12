@@ -1,6 +1,6 @@
 module github.com/hedge10/airmail
 
-go 1.19
+go 1.20
 
 require (
 	github.com/emersion/go-sasl v0.0.0-20220912192320-0145f2c60ead

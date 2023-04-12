@@ -12,7 +12,7 @@ import (
 type Storage struct {
 	Context context.Context
 	Client  *qmgo.QmgoClient
-	Message mail.Email
+	Message *mail.Email
 }
 
 func Connect(c *conf.Config) (*Storage, error) {
@@ -22,7 +22,6 @@ func Connect(c *conf.Config) (*Storage, error) {
 		Username: c.MongoDbUsername,
 		Password: c.MongoDbPassword,
 	}
-
 	client, err := qmgo.Open(ctx, &qmgo.Config{
 		Auth:     &credentials,
 		Uri:      uri,

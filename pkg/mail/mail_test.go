@@ -1,14 +1,15 @@
 package mail
 
 import (
-	"fmt"
+	"log"
 	"testing"
 
+	"github.com/hedge10/airmail/pkg/conf"
 	smtpmock "github.com/mocktools/go-smtp-mock/v2"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSendWithoutAuthWithoutAddressNames(t *testing.T) {
+func TestSmtpSendWithoutAuthWithoutAddressNames(t *testing.T) {
 	server := smtpmock.New(smtpmock.ConfigurationAttr{
 		PortNumber:        2525,
 		LogToStdout:       true,
@@ -19,12 +20,7 @@ func TestSendWithoutAuthWithoutAddressNames(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	print(server.Start().Error())
-
-	m := Email{
-		Connection: Connection{
-			Address: fmt.Sprintf("127.0.0.1:%d", server.PortNumber()),
-		},
+	m := &Email{
 		From: Party{
 			Name:  "",
 			Email: "john.doe@example.com",
@@ -45,7 +41,18 @@ func TestSendWithoutAuthWithoutAddressNames(t *testing.T) {
 		Message: "A fantastic email.",
 	}
 
-	err := m.SendWithoutAuth()
+	transfer, te := CreateTransfer(&conf.Config{
+		MailService: "smtp",
+		SmtpAuth:    "none",
+		SmtpHost:    "localhost",
+		SmtpPort:    2525,
+	})
+
+	if te != nil {
+		log.Fatal(te)
+	}
+
+	err := transfer.Send(m)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(server.Messages()))

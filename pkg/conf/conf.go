@@ -3,13 +3,18 @@ package conf
 import (
 	"fmt"
 
-	"github.com/hedge10/airmail/pkg/mail"
+	"github.com/hedge10/airmail/constants"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
 type Config struct {
+	MailService string `envconfig:"AM_MAIL_SERVICE" default:"smtp"`
+
+	MailgunDomain string `envconfig:"AM_MAILGUN_DOMAIN"`
+	MailgunKey    string `envconfig:"AM_MAILGUN_PRIVATE_KEY"`
+
 	SmtpHost string `envconfig:"AM_SMTP_HOST" default:"127.0.0.1"`
 	SmtpUser string `envconfig:"AM_SMTP_USER" default:""`
 	SmtpPass string `envconfig:"AM_SMTP_PASS" default:""`
@@ -40,15 +45,29 @@ var (
 
 func isValidAuthMechanism(cfg *Config) error {
 	switch cfg.SmtpAuth {
-	case mail.AUTH_NONE, mail.AUTH_PLAIN, mail.AUTH_LOGIN:
+	case constants.AUTH_NONE, constants.AUTH_PLAIN, constants.AUTH_LOGIN:
 		return nil
 	}
 
-	return errors.New(fmt.Sprintf("The authentication mechanism '%s' is unknown. Supported values are: %s, %s, %s.", cfg.SmtpAuth, mail.AUTH_NONE, mail.AUTH_LOGIN, mail.AUTH_PLAIN))
+	return errors.New(fmt.Sprintf("The authentication mechanism '%s' is unknown. Supported values are: %s, %s, %s.", cfg.SmtpAuth, constants.AUTH_NONE, constants.AUTH_PLAIN, constants.AUTH_LOGIN))
+}
+
+func isValidMailService(cfg *Config) error {
+	switch cfg.MailService {
+	case constants.MAIL_SERVICE_SMTP, constants.MAIL_SERVICE_MAILGUN:
+		return nil
+	}
+
+	return errors.New(fmt.Sprintf("The mail service '%s' is unknown. Supported values are: %s, %s.", cfg.MailService, constants.MAIL_SERVICE_MAILGUN, constants.MAIL_SERVICE_SMTP))
 }
 
 func (cfg *Config) validate() error {
 	err := isValidAuthMechanism(cfg)
+	if err != nil {
+		return err
+	}
+
+	err = isValidMailService(cfg)
 	if err != nil {
 		return err
 	}

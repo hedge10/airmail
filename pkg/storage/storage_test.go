@@ -53,7 +53,7 @@ func TestInsert(t *testing.T) {
 	s, err := Connect(config)
 	assert.Nil(t, err)
 
-	s.Message = mail.Email{
+	s.Message = &mail.Email{
 		Subject: "Demo subject",
 		Message: "Demo message",
 		From: mail.Party{

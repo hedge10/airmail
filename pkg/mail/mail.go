@@ -1,43 +1,28 @@
 package mail
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/emersion/go-sasl"
-	"github.com/emersion/go-smtp"
 	"github.com/qiniu/qmgo/field"
 	log "github.com/sirupsen/logrus"
 )
 
 const (
-	AUTH_NONE  string = "none"
-	AUTH_PLAIN string = "plain"
-	AUTH_LOGIN string = "login"
-
 	CT_HTML  string = "text/html"
 	CT_PLAIN string = "text/plain"
 )
 
 type (
-	Connection struct {
-		Address string
-		Client  sasl.Client
-	}
-
 	Meta struct {
 		ContentType string
 	}
-
 	Party struct {
 		Name  string
 		Email string
 	}
-
 	Email struct {
 		field.DefaultField `bson:",inline"`
-		Connection         Connection
 		Meta               Meta
 		From               Party
 		To                 []Party
@@ -47,58 +32,6 @@ type (
 		Message            string
 	}
 )
-
-func CreateClient(auth string, user string, pass string) sasl.Client {
-	log.Debug(fmt.Sprintf("Using '%s' method for authentication", auth))
-
-	if auth == AUTH_LOGIN {
-		return sasl.NewLoginClient(user, pass)
-	}
-
-	return sasl.NewPlainClient("", user, pass)
-}
-
-func (e Email) Send() error {
-	sender := buildSender(e.From)
-	receivers := buildReceivers(e.To)
-	message := buildMessage(sender, receivers, buildRawReceivers(e.Cc), buildRawReceivers(e.Bcc), e.Subject, e.Message, e.Meta.ContentType)
-
-	if e.Connection.Client == nil {
-		log.Warn("no authentication client initialized.")
-		return errors.New("no authentication client initialized")
-	}
-
-	err := smtp.SendMail(e.Connection.Address, e.Connection.Client, sender, receivers, message)
-	if err != nil {
-		log.WithField("smtp_error", err).Error("Sending mail failed")
-	}
-
-	return err
-}
-
-func (e Email) SendWithoutAuth() error {
-	c, err := smtp.Dial(e.Connection.Address)
-
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-	defer c.Close()
-
-	sender := buildSender(e.From)
-	receivers := buildReceivers(e.To)
-	message := buildMessage(sender, buildRawReceivers(e.To), buildRawReceivers(e.Cc), buildRawReceivers(e.Bcc), e.Subject, e.Message, e.Meta.ContentType)
-
-	log.Info("Sending mail to SMTP123")
-	log.Info(e.Connection.Address)
-	error := c.SendMail(sender, receivers, message)
-
-	if err != nil {
-		log.WithField("smtp_error", err).Error("Sending mail failed")
-	}
-
-	return error
-}
 
 func buildSender(from Party) string {
 	sender := from.Email
