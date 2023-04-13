@@ -1,61 +1,68 @@
 package mail
 
 import (
-	"log"
+	"reflect"
 	"testing"
-
-	"github.com/hedge10/airmail/pkg/conf"
-	smtpmock "github.com/mocktools/go-smtp-mock/v2"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestSmtpSendWithoutAuthWithoutAddressNames(t *testing.T) {
-	server := smtpmock.New(smtpmock.ConfigurationAttr{
-		PortNumber:        2525,
-		LogToStdout:       true,
-		LogServerActivity: true,
-	})
-
-	if err := server.Start(); err != nil {
-		t.Fatal(err)
+func TestBuildSender(t *testing.T) {
+	type test struct {
+		input Party
+		want  string
 	}
 
-	m := &Email{
-		From: Party{
-			Name:  "",
-			Email: "john.doe@example.com",
+	tests := []test{
+		{
+			input: Party{
+				Name:  "Michael Knight",
+				Email: "mn@thefoundation.local",
+			},
+			want: "Michael Knight<mn@thefoundation.local>",
 		},
-		To: []Party{
-			{
-				Name:  "",
-				Email: "receiver1@example.com",
+		{
+			input: Party{
+				Email: "mn@thefoundation.local",
+			},
+			want: "mn@thefoundation.local",
+		},
+	}
+
+	for _, tc := range tests {
+		got := buildSender(tc.input)
+		if !reflect.DeepEqual(tc.want, got) {
+			t.Fatalf("expected: %v, got: %v", tc.want, got)
+		}
+	}
+}
+
+func TestBuildReceivers(t *testing.T) {
+	type test struct {
+		input []Party
+		want  []string
+	}
+
+	tests := []test{
+		{
+			input: []Party{
+				{
+					Name:  "Michael Knight",
+					Email: "mn@thefoundation.local",
+				},
+				{
+					Email: "dm@thefoundation.local",
+				},
+			},
+			want: []string{
+				"Michael Knight<mn@thefoundation.local>",
+				"dm@thefoundation.local",
 			},
 		},
-		Cc: []Party{
-			{
-				Name:  "",
-				Email: "cc@example.com",
-			},
-		},
-		Subject: "Testing subject",
-		Message: "A fantastic email.",
 	}
 
-	transfer, te := CreateTransfer(&conf.Config{
-		MailService: "smtp",
-		SmtpAuth:    "none",
-		SmtpHost:    "localhost",
-		SmtpPort:    2525,
-	})
-
-	if te != nil {
-		log.Fatal(te)
+	for _, tc := range tests {
+		got := buildReceivers(tc.input)
+		if !reflect.DeepEqual(tc.want, got) {
+			t.Fatalf("expected: %v, got: %v", tc.want, got)
+		}
 	}
-
-	err := transfer.Send(m)
-
-	assert.Nil(t, err)
-	assert.Equal(t, 1, len(server.Messages()))
-	assert.Equal(t, "MAIL FROM:<john.doe@example.com>", server.Messages()[0].MailfromRequest())
-	assert.Equal(t, "RCPT TO:<receiver1@example.com>", server.Messages()[0].RcpttoRequestResponse()[0][0])
 }

@@ -12,8 +12,9 @@ import (
 type Config struct {
 	MailService string `envconfig:"AM_MAIL_SERVICE" default:"smtp"`
 
-	MailgunDomain string `envconfig:"AM_MAILGUN_DOMAIN"`
-	MailgunKey    string `envconfig:"AM_MAILGUN_PRIVATE_KEY"`
+	MailgunDomain      string `envconfig:"AM_MAILGUN_DOMAIN"`
+	MailgunKey         string `envconfig:"AM_MAILGUN_PRIVATE_KEY"`
+	MailgunUseEuDomain bool   `envconfig:"AM_MAILGUN_USE_EU_DOMAIN" default:"false"`
 
 	SmtpHost string `envconfig:"AM_SMTP_HOST" default:"127.0.0.1"`
 	SmtpUser string `envconfig:"AM_SMTP_USER" default:""`

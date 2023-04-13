@@ -16,9 +16,9 @@ type Transfer interface {
 func CreateTransfer(config *conf.Config) (Transfer, error) {
 	if config.MailService == constants.MAIL_SERVICE_MAILGUN {
 		return &Mailgun{
-			Domain:      "",
-			PrivateKey:  "",
-			UseEuDomain: false,
+			Domain:      config.MailgunDomain,
+			PrivateKey:  config.MailgunKey,
+			UseEuDomain: config.MailgunUseEuDomain,
 		}, nil
 	}
 
