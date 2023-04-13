@@ -2,7 +2,6 @@ package conf
 
 import (
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/hedge10/airmail/constants"
@@ -19,7 +18,8 @@ func TestValidateMailService(t *testing.T) {
 	tests := []test{
 		{input: "smtp", want: nil},
 		{input: "mailgun", want: nil},
-		{input: "unknown", want: fmt.Errorf("The mail service '%s' is unknown. Supported values are: %s, %s.", "unknown", constants.MAIL_SERVICE_MAILGUN, constants.MAIL_SERVICE_SMTP)},
+		{input: "ses", want: nil},
+		{input: "unknown", want: fmt.Errorf("The mail service '%s' is unknown. Supported values are: %s, %s, %s.", "unknown", constants.MAIL_SERVICE_MAILGUN, constants.MAIL_SERVICE_SMTP, constants.MAIL_SERVICE_SES)},
 	}
 
 	for _, tc := range tests {
@@ -63,24 +63,25 @@ func TestValidateAuthMechanism(t *testing.T) {
 	}
 }
 
-func TestDefaultInfoLogLevel(t *testing.T) {
-	os.Setenv("AM_DEBUG", "false")
-	defer os.Unsetenv("AM_DEBUG")
+func TestValidateLogLevel(t *testing.T) {
+	type test struct {
+		input bool
+		level string
+	}
 
-	conf, err := New()
+	tests := []test{
+		{input: true, level: "debug"},
+		{input: false, level: "info"},
+	}
 
-	assert.NotNil(t, conf)
-	assert.Nil(t, err)
-	assert.Equal(t, "info", log.GetLevel().String())
-}
+	for _, tc := range tests {
+		c := &Config{
+			Debug: tc.input,
+		}
 
-func TestSetDebugLogLevel(t *testing.T) {
-	os.Setenv("AM_DEBUG", "true")
-	defer os.Unsetenv("AM_DEBUG")
+		err := c.logging()
 
-	conf, err := New()
-
-	assert.NotNil(t, conf)
-	assert.Nil(t, err)
-	assert.Equal(t, "debug", log.GetLevel().String())
+		assert.Nil(t, err)
+		assert.Equal(t, tc.level, log.GetLevel().String())
+	}
 }

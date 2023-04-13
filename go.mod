@@ -5,7 +5,6 @@ go 1.20
 require (
 	github.com/emersion/go-sasl v0.0.0-20220912192320-0145f2c60ead
 	github.com/go-playground/form v3.1.4+incompatible
-	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/stretchr/testify v1.8.2
 	go.mongodb.org/mongo-driver v1.11.4
 )
@@ -19,6 +18,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/klauspost/compress v1.16.4 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
@@ -41,6 +41,7 @@ require (
 )
 
 require (
+	github.com/aws/aws-sdk-go v1.44.242
 	github.com/emersion/go-smtp v0.16.0
 	github.com/invopop/validation v0.3.0
 	github.com/justinas/alice v1.2.0
@@ -49,6 +50,7 @@ require (
 	github.com/mocktools/go-smtp-mock/v2 v2.0.5
 	github.com/pkg/errors v0.9.1
 	github.com/qiniu/qmgo v1.1.5
+	github.com/sethvargo/go-envconfig v0.9.0
 	github.com/sirupsen/logrus v1.9.0
 	golang.org/x/sys v0.7.0 // indirect
 )

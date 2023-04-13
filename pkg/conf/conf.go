@@ -1,43 +1,48 @@
 package conf
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hedge10/airmail/constants"
-	"github.com/kelseyhightower/envconfig"
 	"github.com/pkg/errors"
+	"github.com/sethvargo/go-envconfig"
 	log "github.com/sirupsen/logrus"
 )
 
 type Config struct {
-	MailService string `envconfig:"AM_MAIL_SERVICE" default:"smtp"`
+	MailService string `env:"AM_MAIL_SERVICE,default=smtp"`
 
-	MailgunDomain      string `envconfig:"AM_MAILGUN_DOMAIN"`
-	MailgunKey         string `envconfig:"AM_MAILGUN_PRIVATE_KEY"`
-	MailgunUseEuDomain bool   `envconfig:"AM_MAILGUN_USE_EU_DOMAIN" default:"false"`
+	SesRegion             string `env:"AM_SES_REGION,default=$AWS_REGION"`
+	SesAwsAccessKeyId     string `env:"AM_SES_AWS_ACCESS_KEY_ID,default=$AWS_ACCESS_KEY_ID"`
+	SesAwsSecretAccessKey string `env:"AM_SES_AWS_SECRET_ACCESS_KEY,default=$AWS_SECRET_ACCESS_KEY"`
 
-	SmtpHost string `envconfig:"AM_SMTP_HOST" default:"127.0.0.1"`
-	SmtpUser string `envconfig:"AM_SMTP_USER" default:""`
-	SmtpPass string `envconfig:"AM_SMTP_PASS" default:""`
-	SmtpPort int    `envconfig:"AM_SMTP_PORT" default:"25"`
-	SmtpAuth string `envconfig:"AM_SMTP_AUTH_MECHANISM" default:"none"`
+	MailgunDomain      string `env:"AM_MAILGUN_DOMAIN"`
+	MailgunKey         string `env:"AM_MAILGUN_PRIVATE_KEY"`
+	MailgunUseEuDomain bool   `env:"AM_MAILGUN_USE_EU_DOMAIN,default=false"`
 
-	Host string `envconfig:"AM_HOST" default:""`
-	Port int    `envconfig:"AM_PORT" default:"9900"`
+	SmtpHost string `env:"AM_SMTP_HOST,default=127.0.0.1"`
+	SmtpUser string `env:"AM_SMTP_USER"`
+	SmtpPass string `env:"AM_SMTP_PASS"`
+	SmtpPort int    `env:"AM_SMTP_PORT,default=25"`
+	SmtpAuth string `env:"AM_SMTP_AUTH_MECHANISM,default=none"`
 
-	Debug bool   `envconfig:"AM_DEBUG" default:"false"`
-	Env   string `envconfig:"AM_ENV" default:"dev"`
+	Host string `env:"AM_HOST"`
+	Port int    `env:"AM_PORT,default=9900"`
 
-	GrecaptchaSecret string `envconfig:"AM_GRECAPTCHA_SECRET" default:""`
+	Debug bool   `env:"AM_DEBUG,default=false"`
+	Env   string `env:"AM_ENV,default=dev"`
 
-	UseStorage        bool   `envconfig:"AM_USE_STORAGE" default:"false"`
-	StorageType       string `envconfig:"AM_STORAGE_TYPE" default:"mongodb"`
-	MongoDbHost       string `envconfig:"AM_MONGODB_HOST" default:"localhost"`
-	MongoDbPort       int    `envconfig:"AM_MONGODB_PORT" default:"27017"`
-	MongoDbDatabase   string `envconfig:"AM_MONGODB_DB" default:"airmail"`
-	MongoDbCollection string `envconfig:"AM_MONGODB_COLLECTION" default:"messages"`
-	MongoDbUsername   string `envconfig:"AM_MONGODB_USERNAME" default:""`
-	MongoDbPassword   string `envconfig:"AM_MONGODB_PASSWORD" default:""`
+	GrecaptchaSecret string `env:"AM_GRECAPTCHA_SECRET"`
+
+	UseStorage        bool   `env:"AM_USE_STORAGE,default=false"`
+	StorageType       string `env:"AM_STORAGE_TYPE,default=mongodb"`
+	MongoDbHost       string `env:"AM_MONGODB_HOST,default=localhost"`
+	MongoDbPort       int    `env:"AM_MONGODB_PORT,default=27017"`
+	MongoDbDatabase   string `env:"AM_MONGODB_DB,default=airmail"`
+	MongoDbCollection string `env:"AM_MONGODB_COLLECTION,default=messages"`
+	MongoDbUsername   string `env:"AM_MONGODB_USERNAME,default=root"`
+	MongoDbPassword   string `env:"AM_MONGODB_PASSWORD,default=root"`
 }
 
 func isValidAuthMechanism(cfg *Config) error {
@@ -51,11 +56,11 @@ func isValidAuthMechanism(cfg *Config) error {
 
 func isValidMailService(cfg *Config) error {
 	switch cfg.MailService {
-	case constants.MAIL_SERVICE_SMTP, constants.MAIL_SERVICE_MAILGUN:
+	case constants.MAIL_SERVICE_SMTP, constants.MAIL_SERVICE_MAILGUN, constants.MAIL_SERVICE_SES:
 		return nil
 	}
 
-	return errors.New(fmt.Sprintf("The mail service '%s' is unknown. Supported values are: %s, %s.", cfg.MailService, constants.MAIL_SERVICE_MAILGUN, constants.MAIL_SERVICE_SMTP))
+	return errors.New(fmt.Sprintf("The mail service '%s' is unknown. Supported values are: %s, %s, %s.", cfg.MailService, constants.MAIL_SERVICE_MAILGUN, constants.MAIL_SERVICE_SMTP, constants.MAIL_SERVICE_SES))
 }
 
 func (cfg *Config) validate() error {
@@ -73,6 +78,8 @@ func (cfg *Config) validate() error {
 }
 
 func (cfg *Config) logging() error {
+	log.SetLevel(log.InfoLevel)
+
 	if cfg.Debug {
 		log.SetLevel(log.DebugLevel)
 	}
@@ -85,7 +92,7 @@ func (cfg *Config) logging() error {
 func New() (*Config, error) {
 	config := new(Config)
 
-	err := envconfig.Process("", config)
+	err := envconfig.Process(context.Background(), config)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to parse environment config")
 	}

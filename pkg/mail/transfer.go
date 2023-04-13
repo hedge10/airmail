@@ -35,5 +35,13 @@ func CreateTransfer(config *conf.Config) (Transfer, error) {
 
 	}
 
+	if config.MailService == constants.MAIL_SERVICE_SES {
+		return &Ses{
+			AwsAccessKeyId:     config.SesAwsAccessKeyId,
+			AwsSecretAccessKey: config.SesAwsSecretAccessKey,
+			Region:             config.SesRegion,
+		}, nil
+	}
+
 	return nil, errors.New("cannot create transfer")
 }

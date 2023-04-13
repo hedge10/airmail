@@ -22,11 +22,7 @@ func (m Mailgun) Send(e *Email) error {
 	}
 
 	// Creating receipients
-	to := make([]string, 0, len(e.To))
-	for _, t := range e.To {
-		to = append(to, string(t.Email))
-	}
-
+	to := buildRawReceivers(e.To)
 	message := mg.NewMessage(e.From.Email, e.Subject, e.Message, to...)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
