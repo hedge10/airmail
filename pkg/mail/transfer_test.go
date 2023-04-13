@@ -17,6 +17,7 @@ func TestCreateTransfert(t *testing.T) {
 	tests := []test{
 		{input: "mailgun", want: nil},
 		{input: "smtp", want: nil},
+		{input: "ses", want: nil},
 		{input: "unknown", want: errors.New("cannot create transfer")},
 	}
 
