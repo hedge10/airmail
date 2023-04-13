@@ -25,7 +25,10 @@ run:
     docker run --rm -it -p 9900:9900 -e AM_SMTP_HOST="$AM_SMTP_HOST" -e AM_SMTP_PORT="$AM_SMTP_PORT" -e AM_SMTP_USER="$AM_SMTP_USER" -e AM_SMTP_PASS="$AM_SMTP_PASS" -e AM_SMTP_AUTH_MECHANISM="$AM_SMTP_AUTH_MECHANISM" -e AM_DEBUG="$AM_DEBUG" --entrypoint /bin/sh {{ IMAGE }}
 
 test:
-    go test -v -cover ./...
+    go test -cover -coverprofile=coverage.out ./...
+
+test-coverage: test
+    go tool cover -func coverage.out | grep total | awk '{print $3}'
 
 up:
     docker-compose up
