@@ -6,7 +6,7 @@
 
 ![Airmail](./art/airmail-scheme.svg "Title")
 
-Airmail is a small "form service" to be used for static pages contact forms. It takes your form submission and sends it to a configured mail delivery.
+Airmail is a "form service" to be used for static pages contact forms. It takes your form submission and sends it to a configured mail delivery.
 
 Find all about installation and configuration of _Airmail_ on https://docs.viaairmail.de/.
 
@@ -24,7 +24,7 @@ Run `just up` in the root folder to spin up the following Docker container:
 -   MongoDB: a container running MongoDB
 -   Mongo Express: A small UI for managing MongoDB and inspecting collections reachable via `http://localhost:8888`
 
-Happy coding fun! 🕺🏻💃🏻
+Happy coding! 🕺🏻💃🏻
 
 ## Contributing
 
