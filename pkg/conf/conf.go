@@ -40,10 +40,6 @@ type Config struct {
 	MongoDbPassword   string `envconfig:"AM_MONGODB_PASSWORD" default:""`
 }
 
-var (
-	ErrCannotConnectToSmtp = errors.New("Cannot connect to SMTP server. Please check the connection details.")
-)
-
 func isValidAuthMechanism(cfg *Config) error {
 	switch cfg.SmtpAuth {
 	case constants.AUTH_NONE, constants.AUTH_PLAIN, constants.AUTH_LOGIN:
