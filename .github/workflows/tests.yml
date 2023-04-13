@@ -9,7 +9,7 @@ jobs:
       - name: Check out source code
         uses: actions/checkout@v3
 
-      - name: Start MongoDB v${{ matrix.mongodb-version }}
+      - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.8.0
         with:
           mongodb-version: 6.0.5
@@ -29,3 +29,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test
         run: just test
+      - name: Coverage
+        run: just test-coverage

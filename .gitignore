@@ -5,5 +5,8 @@
 # Goreleaser output folder
 /dist
 
+# Go test coverage
+coverage.out
+
 # AIR
 /tmp

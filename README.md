@@ -4,19 +4,19 @@
 
 # Airmail
 
-⚠️ This project is under heavy development. Please open an issue for questions and recommendations.
+![Airmail](./art/airmail-scheme.svg "Title")
 
-Airmail is a small "form service" to be used for static pages contact forms. It takes your form submission and sends it to a SMTP server.
+Airmail is a small "form service" to be used for static pages contact forms. It takes your form submission and sends it to a configured mail delivery.
 
 Find all about installation and configuration of _Airmail_ on https://docs.viaairmail.de/.
 
 ## Development
 
-Prerequites:
+Prerequite(s):
 
 -   [just](https://github.com/casey/just) command runner
 
-:info: You can use the development setup without using `just`. Have a look into the [`justfile`](./justfile) for individual commands.
+🗒️ You can use the development setup without using `just`. Have a look into the [`justfile`](./justfile) for individual commands.
 
 Run `just up` in the root folder to spin up the following Docker container:
 

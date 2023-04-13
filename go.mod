@@ -1,6 +1,6 @@
 module github.com/hedge10/airmail
 
-go 1.19
+go 1.20
 
 require (
 	github.com/emersion/go-sasl v0.0.0-20220912192320-0145f2c60ead
@@ -18,9 +18,13 @@ require (
 	github.com/go-playground/validator/v10 v10.12.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
+	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/klauspost/compress v1.16.4 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/leodido/go-urn v1.2.3 // indirect
+	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
+	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742 // indirect
 	github.com/montanaflynn/stats v0.7.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/smartystreets/goconvey v1.7.2 // indirect
@@ -40,6 +44,7 @@ require (
 	github.com/emersion/go-smtp v0.16.0
 	github.com/invopop/validation v0.3.0
 	github.com/justinas/alice v1.2.0
+	github.com/mailgun/mailgun-go/v4 v4.8.2
 	github.com/mholt/binding v0.3.0
 	github.com/mocktools/go-smtp-mock/v2 v2.0.5
 	github.com/pkg/errors v0.9.1

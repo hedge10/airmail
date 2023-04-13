@@ -114,38 +114,29 @@ func IncomingMessageHandler(config *conf.Config, storage *storage.Storage) http.
 			}
 		}
 
-		// Start sending email
-		from := mail.Party{
-			Name:  mr.SenderName,
-			Email: mr.SenderAddress,
-		}
-		address := fmt.Sprintf("%s:%d", config.SmtpHost, config.SmtpPort)
-		to := buildReceivers(mr.To)
-		cc := buildReceivers(mr.Cc)
-		bcc := buildReceivers(mr.Bcc)
-
-		m := mail.Email{
-			Connection: mail.Connection{
-				Address: address,
-			},
+		m := &mail.Email{
 			Meta: mail.Meta{
 				ContentType: strings.ToLower(mr.ContentType),
 			},
-			From:    from,
-			To:      to,
-			Cc:      cc,
-			Bcc:     bcc,
+			From: mail.Party{
+				Name:  mr.SenderName,
+				Email: mr.SenderAddress,
+			},
+			To:      buildReceivers(mr.To),
+			Cc:      buildReceivers(mr.Cc),
+			Bcc:     buildReceivers(mr.Bcc),
 			Subject: mr.Subject,
 			Message: mr.Message,
 		}
 
-		var e error
-		if config.SmtpAuth == mail.AUTH_NONE {
-			e = m.SendWithoutAuth()
-		} else {
-			m.Connection.Client = mail.CreateClient(config.SmtpAuth, config.SmtpUser, config.SmtpPass)
-			e = m.Send()
+		t, err := mail.CreateTransfer(config)
+		if err != nil {
+			log.Error(fmt.Sprintf("Unknown mail service '%s'", config.MailService))
+			http.Error(w, "Cannot create transfer", http.StatusUnprocessableEntity)
+			return
 		}
+
+		e := t.Send(m)
 		if e != nil {
 			http.Error(w, e.Error(), http.StatusBadRequest)
 		}
