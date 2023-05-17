@@ -51,6 +51,6 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/qiniu/qmgo v1.1.5
 	github.com/sethvargo/go-envconfig v0.9.0
-	github.com/sirupsen/logrus v1.9.0
+	github.com/sirupsen/logrus v1.9.1
 	golang.org/x/sys v0.7.0 // indirect
 )
