@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/emersion/go-sasl v0.0.0-20220912192320-0145f2c60ead
 	github.com/go-playground/form v3.1.4+incompatible
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.3
 	go.mongodb.org/mongo-driver v1.11.4
 )
 
