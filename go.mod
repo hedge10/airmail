@@ -6,7 +6,7 @@ require (
 	github.com/emersion/go-sasl v0.0.0-20220912192320-0145f2c60ead
 	github.com/go-playground/form v3.1.4+incompatible
 	github.com/stretchr/testify v1.8.2
-	go.mongodb.org/mongo-driver v1.11.4
+	go.mongodb.org/mongo-driver v1.11.6
 )
 
 require (
@@ -49,7 +49,7 @@ require (
 	github.com/mholt/binding v0.3.0
 	github.com/mocktools/go-smtp-mock/v2 v2.0.5
 	github.com/pkg/errors v0.9.1
-	github.com/qiniu/qmgo v1.1.5
+	github.com/qiniu/qmgo v1.1.8
 	github.com/sethvargo/go-envconfig v0.9.0
 	github.com/sirupsen/logrus v1.9.0
 	golang.org/x/sys v0.7.0 // indirect
