@@ -9,28 +9,67 @@ builds:
   - main: ./cmd/airmail
     binary: airmail
     env:
+      - DOCKER_CLI_EXPERIMENTAL=enabled
       - CGO_ENABLED=0
     goos:
       - linux
-      - windows
       - darwin
     goarch:
       - amd64
       - arm64
-      - arm
-    ignore:
-      - goos: windows
-        goarch: arm
-      - goos: darwin
-        goarch: arm
 
-archives:
-  - name_template: "airmail_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    format: zip
-    files:
-      - LICENSE*
-      - CHANGELOG*
-      - README*
+dockers:
+  - image_templates:
+      - hedge10/airmail:latest
+      - hedge10/airmail:{{.Tag}}
+      - ghcr.io/hedge10/airmail:latest
+      - ghcr.io/hedge10/airmail:{{.Tag}}
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - --platform=linux/amd64
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - --label=org.opencontainers.image.description={{ .ProjectName }}
+      - --label=org.opencontainers.image.url=https://github.com/hedge10/{{ .ProjectName }}
+      - --label=org.opencontainers.image.source=https://github.com/hedge10/{{ .ProjectName }}
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.created={{ .Date }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - --label=org.opencontainers.image.licenses=MIT
+  - image_templates:
+      - hedge10/airmail:{{.Tag}}-arm64v8
+      - ghcr.io/hedge10/airmail:{{.Tag}}-arm64v8
+    goarch: arm64
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - --platform=linux/arm64/v8
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - --label=org.opencontainers.image.description={{ .ProjectName }}
+      - --label=org.opencontainers.image.url=https://github.com/hedge10/{{ .ProjectName }}
+      - --label=org.opencontainers.image.source=https://github.com/hedge10/{{ .ProjectName }}
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.created={{ .Date  }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - --label=org.opencontainers.image.licenses=MIT
+
+docker_manifests:
+  - name_template: hedge10/airmail:latest
+    image_templates:
+      - hedge10/airmail:{{.Tag}}
+      - hedge10/airmail:{{.Tag}}-arm64v8
+  - name_template: hedge10/airmail:{{.Tag}}
+    image_templates:
+      - hedge10/airmail:{{.Tag}}
+      - hedge10/airmail:{{.Tag}}-arm64v8
+  - name_template: ghcr.io/hedge10/airmail:latest
+    image_templates:
+      - ghcr.io/hedge10/airmail:{{.Tag}}
+      - ghcr.io/hedge10/airmail:{{.Tag}}-arm64v8
+  - name_template: ghcr.io/hedge10/airmail:{{.Tag}}
+    image_templates:
+      - ghcr.io/hedge10/airmail:{{.Tag}}
+      - ghcr.io/hedge10/airmail:{{.Tag}}-arm64v8
 
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
