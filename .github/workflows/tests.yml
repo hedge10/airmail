@@ -2,32 +2,35 @@ name: Test
 on: [push, pull_request]
 
 jobs:
-  go-test:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        go-version: [1.21.x]
 
     steps:
       - name: Check out source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.8.0
+      - name: Prepare TLS
+        run: |
+          chmod +x ${GITHUB_WORKSPACE}/docker/tls.sh
+          /bin/sh ${GITHUB_WORKSPACE}/docker/tls.sh ${GITHUB_WORKSPACE}/docker/openssl.cnf
+
+      - name: Start Mailpit
+        uses: addnab/docker-run-action@v3
         with:
-          mongodb-version: 6.0.5
-          mongodb-username: root
-          mongodb-password: root
-          mongodb-db: airmail
+          image: axllent/mailpit
+          options: -p 1025:1025 -p 8025:8025 -v ${{ github.workspace }}/certs:/airmail-certs -d
+          run: |
+            /mailpit --smtp-tls-cert /airmail-certs/airmail.pem --smtp-tls-key /airmail-certs/privkey.pem --smtp-auth-accept-any
 
       - name: Setup Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version-file: "go.mod"
-          cache: true
+          go-version: ${{ matrix.go-version }}
+          cache: false
 
-      - name: Setup just
-        uses: extractions/setup-just@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test
-        run: just test
-      - name: Coverage
-        run: just test-coverage
+        run: go test -cover -coverprofile=coverage.out ./...

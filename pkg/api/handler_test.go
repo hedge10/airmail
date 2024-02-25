@@ -2,39 +2,107 @@ package api
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
-	"fmt"
+	"io"
+	"log"
+	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/hedge10/airmail/pkg/conf"
-	smtpmock "github.com/mocktools/go-smtp-mock/v2"
 	"github.com/stretchr/testify/assert"
 )
 
-func setup(t *testing.T) *smtpmock.Server {
-	server := smtpmock.New(smtpmock.ConfigurationAttr{
-		PortNumber:        2525,
-		LogToStdout:       true,
-		LogServerActivity: true,
-	})
-	if err := server.Start(); err != nil {
-		t.Fatal(err)
-	}
-	os.Setenv("AM_SMTP_PORT", "2525")
-
-	return server
+type MailpitMessage struct {
+	Attachments int `json:"Attachments"`
+	Bcc         []struct {
+		Address string `json:"Address"`
+		Name    string `json:"Name"`
+	} `json:"Bcc"`
+	Cc []struct {
+		Address string `json:"Address"`
+		Name    string `json:"Name"`
+	} `json:"Cc"`
+	Created time.Time `json:"Created"`
+	From    struct {
+		Address string `json:"Address"`
+		Name    string `json:"Name"`
+	} `json:"From"`
+	ID        string `json:"ID"`
+	MessageID string `json:"MessageID"`
+	Read      bool   `json:"Read"`
+	ReplyTo   []struct {
+		Address string `json:"Address"`
+		Name    string `json:"Name"`
+	} `json:"ReplyTo"`
+	Size    int      `json:"Size"`
+	Snippet string   `json:"Snippet"`
+	Subject string   `json:"Subject"`
+	Tags    []string `json:"Tags"`
+	To      []struct {
+		Address string `json:"Address"`
+		Name    string `json:"Name"`
+	} `json:"To"`
 }
 
-func teardown(s *smtpmock.Server) {
-	if err := s.Stop(); err != nil {
-		fmt.Println(err)
+type MailpitMessagesResponse struct {
+	Messages []MailpitMessage `json:"messages"`
+}
+
+const mail_server_uri string = "http://localhost:8025/api/v1"
+
+func delete() {
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodDelete, mail_server_uri+"/messages", nil)
+	if err != nil {
+		log.Fatal("Cannot create new delete request. " + err.Error())
 	}
-	defer os.Unsetenv("AM_SMTP_PORT")
+
+	_, err = client.Do(req)
+	if err != nil {
+		log.Fatal("Cannot delete messages. " + err.Error())
+		return
+	}
+}
+
+func get_latest_mail() (*MailpitMessage, error) {
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodGet, mail_server_uri+"/messages", nil)
+	if err != nil {
+		log.Fatal(errors.New(err.Error()))
+	}
+
+	q := req.URL.Query()
+	q.Add("limit", "1")
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(errors.New(err.Error()))
+	}
+	defer resp.Body.Close()
+
+	mr := &MailpitMessagesResponse{}
+	body, _ := io.ReadAll(resp.Body)
+	json_err := json.Unmarshal(body, mr)
+
+	if json_err != nil {
+		return nil, errors.New("Cannot read mailpit api response")
+	}
+
+	return &mr.Messages[0], nil
+}
+
+func setup() {
+	delete()
+
+	os.Setenv("AM_SMTP_PORT", "1025")
 }
 
 func getFormValuesWithRedirect(redirect string) url.Values {
@@ -58,8 +126,7 @@ func getFormValues() url.Values {
 }
 
 func TestIncomingMessageHandlerWithFormData(t *testing.T) {
-	s := setup(t)
-	defer teardown(s)
+	setup()
 
 	config, _ := conf.New()
 
@@ -69,14 +136,17 @@ func TestIncomingMessageHandlerWithFormData(t *testing.T) {
 	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	w := httptest.NewRecorder()
 
-	IncomingMessageHandler(config, nil).ServeHTTP(w, r)
+	IncomingMessageHandler(config).ServeHTTP(w, r)
+
+	actual, _ := get_latest_mail()
 
 	assert.Equal(t, 200, w.Result().StatusCode)
+	assert.Equal(t, "john.doe@example.com", actual.From.Address)
+	assert.Equal(t, "Sample email subject", actual.Subject)
 }
 
 func TestIncomingMessageHandlerWithFormDataAndRedirectUrl(t *testing.T) {
-	s := setup(t)
-	defer teardown(s)
+	setup()
 
 	config, _ := conf.New()
 
@@ -86,14 +156,13 @@ func TestIncomingMessageHandlerWithFormDataAndRedirectUrl(t *testing.T) {
 	r.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	w := httptest.NewRecorder()
 
-	IncomingMessageHandler(config, nil).ServeHTTP(w, r)
+	IncomingMessageHandler(config).ServeHTTP(w, r)
 
 	assert.Equal(t, 308, w.Result().StatusCode)
 }
 
 func TestIncomingMessageHandlerWithJsonData(t *testing.T) {
-	s := setup(t)
-	defer teardown(s)
+	setup()
 
 	json := []byte(`{
 		"sender-address": "john.doe@example.com",
@@ -131,29 +200,25 @@ func TestIncomingMessageHandlerWithJsonData(t *testing.T) {
 	r.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
 
-	IncomingMessageHandler(config, nil).ServeHTTP(w, r)
+	IncomingMessageHandler(config).ServeHTTP(w, r)
 
 	assert.Equal(t, 200, w.Result().StatusCode)
 }
 
 func TestIncomingMessageHandlerWithUnknownContentType(t *testing.T) {
-	s := setup(t)
-	defer teardown(s)
+	setup()
 
 	config, _ := conf.New()
 
 	r := httptest.NewRequest("POST", "/", nil)
 	w := httptest.NewRecorder()
 
-	IncomingMessageHandler(config, nil).ServeHTTP(w, r)
+	IncomingMessageHandler(config).ServeHTTP(w, r)
 
 	assert.Equal(t, 200, w.Result().StatusCode)
 }
 
 func TestValidation(t *testing.T) {
-	s := setup(t)
-	defer teardown(s)
-
 	type test struct {
 		mr   MessageRequest
 		want error

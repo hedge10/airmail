@@ -3,12 +3,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <script>
-      function onSubmit(token) {
-        document.getElementById("demo-form").submit();
-      }
-    </script>
   </head>
   <body>
     <div class="container mx-auto max-w-lg mt-8">
@@ -105,15 +99,10 @@
 Demo text</textarea
           >
         </div>
-        <div
-          class="g-recaptcha"
-          data-sitekey="6LeIq6EkAAAAACs3T6d0skQ3KXUrWK3fm8_zWnTP"
-        ></div>
         <div>
           <button
             type="submit"
             class="border bg-blue-600 p-2 text-white font-bold rounded"
-            data-sitekey="6LeIq6EkAAAAACs3T6d0skQ3KXUrWK3fm8_zWnTP"
           >
             Submit
           </button>

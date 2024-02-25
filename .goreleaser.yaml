@@ -3,7 +3,7 @@ before:
     - go mod tidy
 
 release:
-  target_commitish: '{{ .Commit }}'
+  target_commitish: "{{ .Commit }}"
 
 builds:
   - main: ./cmd/airmail
@@ -25,20 +25,19 @@ builds:
         goarch: arm
 
 archives:
-  - name_template: 'airmail_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+  - name_template: "airmail_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     format: zip
     files:
       - LICENSE*
       - CHANGELOG*
       - README*
-    rlcp: true
 
 snapshot:
-  name_template: '{{ incpatch .Version }}-next'
+  name_template: "{{ incpatch .Version }}-next"
 
 changelog:
   sort: asc
   filters:
     exclude:
       # Exclude changes re. the development environment
-      - '^[dD]ev:'
+      - "^[dD]ev:"

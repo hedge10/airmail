@@ -27,22 +27,13 @@ type Config struct {
 	SmtpPort int    `env:"AM_SMTP_PORT,default=25"`
 	SmtpAuth string `env:"AM_SMTP_AUTH_MECHANISM,default=none"`
 
+	AuthToken string `env:"AM_AUTH_TOKEN"`
+
 	Host string `env:"AM_HOST"`
 	Port int    `env:"AM_PORT,default=9900"`
 
 	Debug bool   `env:"AM_DEBUG,default=false"`
 	Env   string `env:"AM_ENV,default=dev"`
-
-	GrecaptchaSecret string `env:"AM_GRECAPTCHA_SECRET"`
-
-	UseStorage        bool   `env:"AM_USE_STORAGE,default=false"`
-	StorageType       string `env:"AM_STORAGE_TYPE,default=mongodb"`
-	MongoDbHost       string `env:"AM_MONGODB_HOST,default=localhost"`
-	MongoDbPort       int    `env:"AM_MONGODB_PORT,default=27017"`
-	MongoDbDatabase   string `env:"AM_MONGODB_DB,default=airmail"`
-	MongoDbCollection string `env:"AM_MONGODB_COLLECTION,default=messages"`
-	MongoDbUsername   string `env:"AM_MONGODB_USERNAME,default=root"`
-	MongoDbPassword   string `env:"AM_MONGODB_PASSWORD,default=root"`
 }
 
 func isValidAuthMechanism(cfg *Config) error {

@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine3.17 AS base
+FROM golang:1.21-alpine3.17 AS base
 ARG VERSION=SNAPSHOT
 ENV CGO_ENABLED=0
 
@@ -20,24 +20,25 @@ ENTRYPOINT [ "/airmail" ]
 
 FROM base AS dev
 
-WORKDIR /root
-COPY ./docker/entrypoint.sh ./docker/openssl.cnf ./
-RUN chmod +x /root/entrypoint.sh
+WORKDIR /
+COPY ./docker/entrypoint.sh ./docker/tls.sh ./docker/openssl.cnf ./
+RUN chmod +x ./entrypoint.sh ./tls.sh
 
-RUN apk add --no-cache curl direnv openssl\
-    && openssl req -x509 -newkey rsa:4096 -nodes -keyout privkey.pem -out airmail.pem -sha256 -days 365 -config /root/openssl.cnf \
-    && cp airmail.pem /usr/local/share/ca-certificates/airmail.crt \
-    && update-ca-certificates
+RUN apk add --no-cache curl direnv openssl
+
+RUN /bin/sh tls.sh /openssl.cnf
 
 COPY --from=axllent/mailpit /mailpit /usr/local/bin/mailpit
 RUN chmod +x /usr/local/bin/mailpit
 
+COPY --from=golangci/golangci-lint /bin/golangci-lint /usr/local/bin/golangci-lint
+RUN chmod +x /usr/local/bin/golangci-lint
+
 # Install AIR
-WORKDIR /
 RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s
 
 WORKDIR /app
 
-ENTRYPOINT ["/bin/bash", "-c", "/bin/air"]
-
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/bin/bash", "-c", "/bin/air"]
 

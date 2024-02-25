@@ -1,0 +1,21 @@
+POST http://localhost:9900
+Content-Type: application/x-www-form-urlencoded
+
+sender-name=John
+&sender-address=john.doe@example.com
+&to[0].name=Batman + Robin
+&to[0].address=batman_and_robin@warnerbros.com
+&to[1].name=Mickey + Goofey
+&to[1].address=mickey_and_goofey@warnerbros.com
+&cc[0].name=Jack and Daniel
+&cc[0].address=jack_and_daniel@whiskey.com
+&cc[1].name=Tim and Struppi
+&cc[1].address=tim_struppi@example.com
+&bcc[0].name=Chip and Chap
+&bcc[0].address=chipchap@disney.com
+&bcc[1].name=Beauty and the Beast
+&bcc[1].address=bb@example.com
+&subject=This is a marvelous email
+&message=This is some sample text.<br>A new line is a good idea.
+&_content-type=html
+#&_redirect=http://google.de

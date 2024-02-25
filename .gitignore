@@ -1,6 +1,13 @@
 .env
 .envrc
 *.db
+semicolon_delimited_script
+
+# Generated "certs" folder from tls.sh
+privkey.pem
+airmail.pem
+airmail.crt
+/certs/*
 
 # Goreleaser output folder
 /dist

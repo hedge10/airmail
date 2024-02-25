@@ -1,6 +1,9 @@
+**/dev/
+
 .git
 .goreleaser.yaml
 .envrc.example
+
 Dockerfile
 justfile
 CONTRIBUTING.md

@@ -9,7 +9,6 @@ import (
 	"github.com/go-playground/form"
 	"github.com/hedge10/airmail/pkg/conf"
 	"github.com/hedge10/airmail/pkg/mail"
-	"github.com/hedge10/airmail/pkg/storage"
 	"github.com/invopop/validation"
 	"github.com/invopop/validation/is"
 	"github.com/mholt/binding"
@@ -34,8 +33,6 @@ type MessageRequest struct {
 	Bcc           []Person `json:"bcc" form:"bcc"`
 	Subject       string   `json:"subject" form:"subject"`
 	Message       string   `json:"message" form:"message"`
-
-	GrecaptchaResponse string `json:"g-recaptcha-response" form:"g-recaptcha-response"`
 
 	ContentType string `json:"_content-type" form:"_content-type"`
 	Redirect    string `json:"_redirect" form:"_redirect"`
@@ -74,7 +71,7 @@ func (mr MessageRequest) Validate() error {
 	return nil
 }
 
-func IncomingMessageHandler(config *conf.Config, storage *storage.Storage) http.Handler {
+func IncomingMessageHandler(config *conf.Config) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		var mr *MessageRequest
 
@@ -102,18 +99,6 @@ func IncomingMessageHandler(config *conf.Config, storage *storage.Storage) http.
 			return
 		}
 
-		// Verify Google recaptcha
-		if len(config.GrecaptchaSecret) > 0 {
-			log.Info("Google Recaptcha active. Trying to validate...")
-			c, _ := CreateClient(BaseUri(GOOGLE_SITE_VERIFY))
-			r := c.ValidateGrecaptcha(config.GrecaptchaSecret, mr.GrecaptchaResponse, r.RemoteAddr)
-			if r != nil {
-				log.WithField("grecaptcha_error", r).Debug("Google Recaptcha validation failed.")
-				http.Error(w, "Google Recaptcha validation failed.", http.StatusUnprocessableEntity)
-				return
-			}
-		}
-
 		m := &mail.Email{
 			Meta: mail.Meta{
 				ContentType: strings.ToLower(mr.ContentType),
@@ -139,15 +124,6 @@ func IncomingMessageHandler(config *conf.Config, storage *storage.Storage) http.
 		e := t.Send(m)
 		if e != nil {
 			http.Error(w, e.Error(), http.StatusBadRequest)
-		}
-
-		// Successfully sent the message, now store it
-		if storage != nil {
-			storage.Message = m
-			err := storage.Insert()
-			if err != nil {
-				log.WithField("error", err).Error("Message was not saved.")
-			}
 		}
 
 		if len(mr.Redirect) > 0 {

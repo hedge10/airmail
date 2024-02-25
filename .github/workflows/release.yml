@@ -4,37 +4,39 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'New tag name'
+        description: "New tag name"
         required: true
-
 
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Start MongoDB v${{ matrix.mongodb-version }}
-        uses: supercharge/mongodb-github-action@1.8.0
+      - name: Prepare TLS
+        run: /bin/sh ${GITHUB_WORKSPACE}/docker/tls.sh ${GITHUB_WORKSPACE}/docker/openssl.cnf
+
+      - name: Start Mailpit
+        uses: addnab/docker-run-action@v3
         with:
-          mongodb-version: 6.0.5
-          mongodb-username: root
-          mongodb-password: root
-          mongodb-db: airmail
+          image: axllent/mailpit
+          options: -p 1025:1025 -p 8025:8025 -v ${{ github.workspace }}/certs:/airmail-certs -d
+          run: |
+            /mailpit --smtp-tls-cert /airmail-certs/airmail.pem --smtp-tls-key /airmail-certs/privkey.pem --smtp-auth-accept-any
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: '>=1.20.0'
+          go-version: "1.21.x"
           cache: true
 
       - name: Run linter
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v4
         with:
-          version: latest
+          version: v1.56
 
       - name: Run tests
         run: go test ./...
@@ -42,7 +44,7 @@ jobs:
       - run: git tag ${{ github.event.inputs.tag }}
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         with:
           distribution: goreleaser
           version: latest

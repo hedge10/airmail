@@ -6,10 +6,6 @@
 
 ![Airmail](./art/airmail-scheme.svg "Title")
 
-Airmail is a "form service" to be used for static pages contact forms. It takes your form submission and sends it to a configured mail delivery.
-
-Find all about installation and configuration of _Airmail_ on https://docs.viaairmail.de/.
-
 ## Development
 
 Prerequite(s):
@@ -21,8 +17,6 @@ Prerequite(s):
 Run `just up` in the root folder to spin up the following Docker container:
 
 -   Airmail: the code is mirrored inside and live-reloaded via [Air](https://github.com/cosmtrek/air). Reach _Airmail_ via `http://localhost:9900`. Additionally this container also provides the local SMTP server [Mailpit](https://github.com/axllent/mailpit) reachable via `http://localhost:8025`
--   MongoDB: a container running MongoDB
--   Mongo Express: A small UI for managing MongoDB and inspecting collections reachable via `http://localhost:8888`
 
 Happy coding! 🕺🏻💃🏻
 
