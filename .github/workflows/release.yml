@@ -27,6 +27,13 @@ jobs:
           run: |
             /mailpit --smtp-tls-cert /airmail-certs/airmail.pem --smtp-tls-key /airmail-certs/privkey.pem --smtp-auth-accept-any
 
+      - name: Docker Login
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.RELEASE_PAT }}
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -51,3 +58,5 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_PAT }}
+          REGISTRY: "ghcr.io"
+          IMAGE_NAME: "hedge10/airmail"

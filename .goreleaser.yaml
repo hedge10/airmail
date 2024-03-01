@@ -14,7 +14,7 @@ builds:
     binary: airmail
     mod_timestamp: "{{ .CommitTimestamp }}"
     ldflags:
-      - -s -w -X "github.com/hedge10/airmail.Version=$VERSION"
+      - -s -w
     env:
       - DOCKER_CLI_EXPERIMENTAL=enabled
       - CGO_ENABLED=0
@@ -27,8 +27,8 @@ builds:
 
 dockers:
   - image_templates:
-      - ghcr.io/hedge10/airmail:latest
-      - ghcr.io/hedge10/airmail:{{.Tag}}
+      - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:latest"
+      - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:{{.Tag}}"
     dockerfile: Dockerfile
     use: buildx
     build_flag_templates:
@@ -42,7 +42,7 @@ dockers:
       - --label=org.opencontainers.image.revision={{ .FullCommit }}
       - --label=org.opencontainers.image.licenses=MIT
   - image_templates:
-      - ghcr.io/hedge10/airmail:{{.Tag}}-arm64v8
+      - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:{{.Tag}}-arm64v8"
     goarch: arm64
     dockerfile: Dockerfile
     use: buildx
@@ -58,14 +58,14 @@ dockers:
       - --label=org.opencontainers.image.licenses=MIT
 
 docker_manifests:
-  - name_template: ghcr.io/hedge10/airmail:latest
+  - name_template: "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:latest"
     image_templates:
-      - ghcr.io/hedge10/airmail:{{.Tag}}
-      - ghcr.io/hedge10/airmail:{{.Tag}}-arm64v8
-  - name_template: ghcr.io/hedge10/airmail:{{.Tag}}
+      - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:{{.Tag}}"
+      - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:{{.Tag}}-arm64v8"
+  - name_template: "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:{{.Tag}}"
     image_templates:
-      - ghcr.io/hedge10/airmail:{{.Tag}}
-      - ghcr.io/hedge10/airmail:{{.Tag}}-arm64v8
+      - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:{{.Tag}}"
+      - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:{{.Tag}}-arm64v8"
 
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
