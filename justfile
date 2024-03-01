@@ -16,7 +16,7 @@ down:
     docker-compose down -v
 
 release:
-    goreleaser build --single-target --snapshot --clean
+    goreleaser release --snapshot --clean
 
 style:
     docker exec airmail gofmt -w cmd pkg

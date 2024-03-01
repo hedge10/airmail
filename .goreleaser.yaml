@@ -2,12 +2,19 @@ before:
   hooks:
     - go mod tidy
 
+gomod:
+  gobinary: go
+  mod: mod
+
 release:
   target_commitish: "{{ .Commit }}"
 
 builds:
   - main: ./cmd/airmail
     binary: airmail
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    ldflags:
+      - -s -w -X "github.com/hedge10/airmail.Version=$VERSION"
     env:
       - DOCKER_CLI_EXPERIMENTAL=enabled
       - CGO_ENABLED=0
