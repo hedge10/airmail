@@ -27,8 +27,6 @@ builds:
 
 dockers:
   - image_templates:
-      - hedge10/airmail:latest
-      - hedge10/airmail:{{.Tag}}
       - ghcr.io/hedge10/airmail:latest
       - ghcr.io/hedge10/airmail:{{.Tag}}
     dockerfile: Dockerfile
@@ -44,7 +42,6 @@ dockers:
       - --label=org.opencontainers.image.revision={{ .FullCommit }}
       - --label=org.opencontainers.image.licenses=MIT
   - image_templates:
-      - hedge10/airmail:{{.Tag}}-arm64v8
       - ghcr.io/hedge10/airmail:{{.Tag}}-arm64v8
     goarch: arm64
     dockerfile: Dockerfile
