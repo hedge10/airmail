@@ -61,14 +61,6 @@ dockers:
       - --label=org.opencontainers.image.licenses=MIT
 
 docker_manifests:
-  - name_template: hedge10/airmail:latest
-    image_templates:
-      - hedge10/airmail:{{.Tag}}
-      - hedge10/airmail:{{.Tag}}-arm64v8
-  - name_template: hedge10/airmail:{{.Tag}}
-    image_templates:
-      - hedge10/airmail:{{.Tag}}
-      - hedge10/airmail:{{.Tag}}-arm64v8
   - name_template: ghcr.io/hedge10/airmail:latest
     image_templates:
       - ghcr.io/hedge10/airmail:{{.Tag}}
