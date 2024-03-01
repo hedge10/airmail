@@ -13,53 +13,15 @@ import (
 	"reflect"
 	"strings"
 	"testing"
-	"time"
 
+	"github.com/hedge10/airmail/constants"
 	"github.com/hedge10/airmail/pkg/conf"
 	"github.com/stretchr/testify/assert"
 )
 
-type MailpitMessage struct {
-	Attachments int `json:"Attachments"`
-	Bcc         []struct {
-		Address string `json:"Address"`
-		Name    string `json:"Name"`
-	} `json:"Bcc"`
-	Cc []struct {
-		Address string `json:"Address"`
-		Name    string `json:"Name"`
-	} `json:"Cc"`
-	Created time.Time `json:"Created"`
-	From    struct {
-		Address string `json:"Address"`
-		Name    string `json:"Name"`
-	} `json:"From"`
-	ID        string `json:"ID"`
-	MessageID string `json:"MessageID"`
-	Read      bool   `json:"Read"`
-	ReplyTo   []struct {
-		Address string `json:"Address"`
-		Name    string `json:"Name"`
-	} `json:"ReplyTo"`
-	Size    int      `json:"Size"`
-	Snippet string   `json:"Snippet"`
-	Subject string   `json:"Subject"`
-	Tags    []string `json:"Tags"`
-	To      []struct {
-		Address string `json:"Address"`
-		Name    string `json:"Name"`
-	} `json:"To"`
-}
-
-type MailpitMessagesResponse struct {
-	Messages []MailpitMessage `json:"messages"`
-}
-
-const mail_server_uri string = "http://localhost:8025/api/v1"
-
 func delete() {
 	client := &http.Client{}
-	req, err := http.NewRequest(http.MethodDelete, mail_server_uri+"/messages", nil)
+	req, err := http.NewRequest(http.MethodDelete, constants.MAIL_SERVER_URI+"/messages", nil)
 	if err != nil {
 		log.Fatal("Cannot create new delete request. " + err.Error())
 	}
@@ -71,9 +33,9 @@ func delete() {
 	}
 }
 
-func get_latest_mail() (*MailpitMessage, error) {
+func get_latest_mail() (*constants.MailpitMessage, error) {
 	client := &http.Client{}
-	req, err := http.NewRequest(http.MethodGet, mail_server_uri+"/messages", nil)
+	req, err := http.NewRequest(http.MethodGet, constants.MAIL_SERVER_URI+"/messages", nil)
 	if err != nil {
 		log.Fatal(errors.New(err.Error()))
 	}
@@ -88,7 +50,7 @@ func get_latest_mail() (*MailpitMessage, error) {
 	}
 	defer resp.Body.Close()
 
-	mr := &MailpitMessagesResponse{}
+	mr := &constants.MailpitMessagesResponse{}
 	body, _ := io.ReadAll(resp.Body)
 	json_err := json.Unmarshal(body, mr)
 

@@ -34,7 +34,6 @@ require (
 	github.com/justinas/alice v1.2.0
 	github.com/mailgun/mailgun-go/v4 v4.12.0
 	github.com/mholt/binding v0.3.0
-	github.com/mocktools/go-smtp-mock/v2 v2.0.5
 	github.com/pkg/errors v0.9.1
 	github.com/qiniu/qmgo v1.1.8
 	github.com/rs/cors v1.10.1
