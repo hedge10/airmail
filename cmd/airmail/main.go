@@ -18,9 +18,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	auth := middleware.NewToken(cfg.AuthToken)
-
-	middlewares := alice.New(auth.Validate, middleware.EnforceContentType)
+	cors := middleware.NewCorsConfig(cfg.CorsAllowOrigin, cfg.CorsAllowedHeaders, cfg.Debug)
+	middlewares := alice.New(cors.Handler, middleware.EnforceContentType)
+	if !cfg.AuthDisabled {
+		auth := middleware.NewToken(cfg.AuthToken)
+		middlewares.Append(auth.Validate)
+	}
 
 	mux := http.NewServeMux()
 	mux.Handle("/", middlewares.Then(api.IncomingMessageHandler(cfg)))

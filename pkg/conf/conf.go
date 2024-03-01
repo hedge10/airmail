@@ -27,7 +27,10 @@ type Config struct {
 	SmtpPort int    `env:"AM_SMTP_PORT,default=25"`
 	SmtpAuth string `env:"AM_SMTP_AUTH_MECHANISM,default=none"`
 
-	AuthToken string `env:"AM_AUTH_TOKEN"`
+	AuthDisabled       bool   `env:"AM_AUTH_DISABLED,default=false"`
+	AuthToken          string `env:"AM_AUTH_TOKEN"`
+	CorsAllowOrigin    string `env:"AM_CORS_ALLOW_ORIGIN"`
+	CorsAllowedHeaders string `env:"AM_CORS_ALLOWED_HEADERS"`
 
 	Host string `env:"AM_HOST"`
 	Port int    `env:"AM_PORT,default=9900"`

@@ -12,9 +12,12 @@ services:
       - ./:/app
     environment:
       - AM_ENV=dev
-      - AM_DEBUG=false
+      - AM_DEBUG=true
       - AM_SMTP_HOST=${AM_SMTP_HOST}
       - AM_SMTP_PORT=${AM_SMTP_PORT}
       - AM_SMTP_USER=${AM_SMTP_USER}
       - AM_SMTP_PASS=${AM_SMTP_PASS}
+      - AM_AUTH_TOKEN=${AM_AUTH_TOKEN}
+      - AM_CORS_ALLOWED_HEADERS=${AM_CORS_ALLOWED_HEADERS}
+      - AM_CORS_ALLOW_ORIGIN=${AM_CORS_ALLOW_ORIGIN}
       - AM_SMTP_AUTH_MECHANISM=${AM_SMTP_AUTH_MECHANISM}

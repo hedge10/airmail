@@ -28,7 +28,7 @@ jobs:
             /mailpit --smtp-tls-cert /airmail-certs/airmail.pem --smtp-tls-key /airmail-certs/privkey.pem --smtp-auth-accept-any
 
       - name: Docker Login
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}

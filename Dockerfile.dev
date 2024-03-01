@@ -6,7 +6,7 @@ WORKDIR /app
 COPY . /app/
 
 RUN go mod download \
-    && CGO_ENABLED=0 GOOS=linux go build -ldflags="-X 'github.com/hedge10/airmail.Version=$VERSION'" -o airmail ./cmd/airmail
+    && CGO_ENABLED=0 GOOS=linux go build -o airmail ./cmd/airmail
 
 WORKDIR /
 COPY ./docker/entrypoint.sh ./docker/tls.sh ./docker/openssl.cnf ./
