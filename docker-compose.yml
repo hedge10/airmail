@@ -1,12 +1,9 @@
-version: "3.7"
-
 services:
   airmail:
     container_name: airmail
     build:
       context: .
-      dockerfile: Dockerfile
-      target: dev
+      dockerfile: Dockerfile.dev
     ports:
       - "1025:1025"
       - "8025:8025"
