@@ -1,8 +1,7 @@
 module github.com/hedge10/airmail
 
 go 1.21
-
-toolchain go1.21.1
+toolchain go1.22.0
 
 require (
 	github.com/emersion/go-sasl v0.0.0-20231106173351-e73c9f7bad43
@@ -37,7 +36,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/qiniu/qmgo v1.1.8
 	github.com/rs/cors v1.10.1
-	github.com/sethvargo/go-envconfig v1.0.0
+	github.com/sethvargo/go-envconfig v1.0.1
 	github.com/sirupsen/logrus v1.9.3
 	golang.org/x/sys v0.17.0 // indirect
 )
