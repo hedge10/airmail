@@ -28,7 +28,7 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go v1.50.30
+	github.com/aws/aws-sdk-go v1.50.36
 	github.com/emersion/go-smtp v0.20.2
 	github.com/invopop/validation v0.3.0
 	github.com/justinas/alice v1.2.0
